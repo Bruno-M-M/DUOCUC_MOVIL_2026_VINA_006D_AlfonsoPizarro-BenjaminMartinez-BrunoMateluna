@@ -12,7 +12,7 @@ Esta app permite que las emprendedoras gestionen su perfil y su catálogo con fo
 
 ## Estado actual
 
-Está creada la **base de la app**: un proyecto nuevo de Android Studio (plantilla *Empty Activity*) con Jetpack Compose y Material 3. Todavía **no hay** pantallas, navegación, base de datos local ni conexión al servidor: cada funcionalidad se incorpora por historia de usuario, en su propia rama.
+Está creada la **base de la app**: un proyecto de Android Studio (plantilla *Empty Activity*) con Jetpack Compose y Material 3, y la **estructura MVVM** lista, con una pantalla de ejemplo, su ViewModel, una capa de repositorio, un `ServiceLocator` y una prueba unitaria. La pantalla de ejemplo es temporal: se reemplaza por las pantallas reales. Todavía **no hay** navegación, base de datos local (Room) ni conexión al servidor: cada funcionalidad se incorpora por historia de usuario, en su propia rama.
 
 La planificación del equipo (historias, responsables y avance) se lleva en [**Trello**](https://trello.com/b/kFvJRnCK/federaciontextil).
 
@@ -20,7 +20,9 @@ La planificación del equipo (historias, responsables y avance) se lleva en [**T
 
 - Kotlin, Android Studio, Jetpack Compose y Material Design 3
 - Android 9 o superior (`minSdk` 28)
-- Previstas: Navigation Compose, arquitectura MVVM, Room (datos sin conexión), Retrofit y un servidor en Spring Boot (API REST)
+- Arquitectura MVVM con `StateFlow` y corrutinas
+- Dependencias ya agregadas: Navigation Compose, ViewModel para Compose, Room (con KSP) y `kotlinx-coroutines-test` para las pruebas
+- Previstas: Retrofit y un servidor en Spring Boot (API REST)
 
 ## Cómo abrir y ejecutar la app
 
@@ -44,7 +46,44 @@ Dentro de `android/app/src/main/java/com/fundaciontextil/`:
 | Carpeta o archivo | Qué contiene |
 |---|---|
 | `MainActivity.kt` | Punto de entrada de la app |
+| `data/ServiceLocator.kt` | Arma en un solo lugar los repositorios (y, más adelante, la base de datos) y se los entrega a los ViewModels, sin librería de inyección |
+| `data/repository/` | Interfaces de los repositorios y sus implementaciones. Es la única puerta entre los ViewModels y los datos |
+| `ui/<sección>/` | Una carpeta por sección de la app, con su pantalla, su ViewModel y su estado. Hoy solo existe `ui/ejemplo/` |
 | `ui/theme/` | Colores, tipografía y tema Material 3 (por ahora los de la plantilla) |
+
+Las carpetas `data/local/` (Room), `ui/navigation/` y `ui/components/` se crean junto con las tarjetas que las necesitan.
+
+## Arquitectura
+
+La app sigue **MVVM**: cada capa conoce solo a la que tiene debajo.
+
+```
+Pantalla (Compose) ─→ ViewModel ─→ Repositorio (interfaz) ─→ datos (hoy en memoria; luego Room)
+```
+
+| Capa | Responsabilidad | Ejemplo en el código |
+|---|---|---|
+| **Pantalla** | Solo dibuja el estado y avisa cuando el usuario toca algo. No decide nada | `EjemploScreen` |
+| **Estado (`UiState`)** | Un `data class` con todo lo que la pantalla necesita mostrar | `EjemploUiState` |
+| **ViewModel** | Guarda el estado, contiene la lógica y las validaciones, y sobrevive a la rotación de la pantalla | `EjemploViewModel` |
+| **Repositorio** | Decide de dónde salen los datos. El ViewModel depende de la interfaz, no de la implementación | `PulsacionesRepository` |
+| **ServiceLocator** | Crea los repositorios una sola vez y los entrega a los ViewModels mediante una *factory* | `ServiceLocator` |
+
+Reglas del código:
+
+- El `MutableStateFlow` es privado en el ViewModel; la pantalla recibe una versión de solo lectura (`StateFlow`).
+- Las validaciones viven en el ViewModel, no en la pantalla, para poder probarlas sin dibujar nada.
+- Las funciones que acceden a datos son `suspend` y se lanzan con `viewModelScope`.
+
+## Pruebas
+
+Las pruebas unitarias se ejecutan en el computador, sin emulador:
+
+```bash
+./gradlew testDebugUnitTest
+```
+
+En Windows, `gradlew.bat testDebugUnitTest`, desde la carpeta `android`. Los ViewModels se prueban con un repositorio en memoria y `kotlinx-coroutines-test`; el ejemplo está en `app/src/test/.../ui/ejemplo/EjemploViewModelTest.kt`.
 
 ## Cómo trabajamos
 
