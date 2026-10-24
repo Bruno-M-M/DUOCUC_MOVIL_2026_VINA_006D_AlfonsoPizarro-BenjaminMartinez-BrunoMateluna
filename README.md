@@ -46,9 +46,43 @@ Dentro de `android/app/src/main/java/com/fundaciontextil/`:
 | `MainActivity.kt` | Punto de entrada de la app |
 | `ui/theme/` | Colores, tipografía y tema Material 3 (por ahora los de la plantilla) |
 
-## Normas del repositorio
+## Cómo trabajamos
+
+Las tareas se planifican en [Trello](https://trello.com/b/kFvJRnCK/federaciontextil): cada tarjeta es una historia de usuario o una tarea técnica, con su responsable y su checklist. El código sigue un flujo simple, de una rama por tarjeta.
+
+**Ramas**
+
+- `main` siempre compila y es la versión que se podría entregar. Nadie hace commit directo en ella.
+- Cada tarjeta tiene su propia rama, creada desde un `main` actualizado y con el mismo nombre que la tarjeta: `feature/HU-37-registro-cliente`, `fix/login-clave-vacia`, `docs/readme-ejecucion`.
+- Las ramas duran pocos días. Antes de empezar una tarjeta y a diario mientras se trabaja: `git pull` en `main` y traer los cambios a la rama.
+
+```bash
+git switch main
+git pull
+git switch -c feature/HU-37-registro-cliente
+```
+
+**Commits**
 
 - Cada integrante configura en git el correo de **su propia cuenta de GitHub**, para que sus commits queden a su nombre.
-- Una rama por tarea, por ejemplo `feature/HU-14-chat`, y commits con mensaje claro (`feat:`, `fix:`, `docs:`).
+- Commits pequeños, con un mensaje técnico que explique qué cambia y por qué, y un prefijo: `feat:` (funcionalidad), `fix:` (corrección), `refactor:`, `test:` o `docs:`. Por ejemplo: `feat: validar el RUT con dígito verificador en el registro`.
+
+**Pull requests**
+
+1. Al terminar, se sube la rama y se abre un *pull request* hacia `main`. El título lleva la tarjeta: «HU-37 · Registro de cliente».
+2. **Otra persona del equipo** lo revisa y lo aprueba. Nadie une su propio PR.
+3. Se une con *Create a merge commit* o *Rebase and merge* (no *Squash*), para que cada commit conserve su autor.
+4. Se borra la rama y la tarjeta pasa a *Hecho* en Trello.
+
+**Archivos que toca todo el equipo**
+
+`libs.versions.toml`, las rutas y la navegación, y el componente `Campo` se unen a `main` primero y rápido, en cambios pequeños. Así los demás parten de ahí y se evitan conflictos.
+
+**Cierre de la entrega**
+
+Hay una fecha de congelamiento acordada antes de la entrega. Pasada la fecha límite no se sube nada más al repositorio.
+
+## Normas del repositorio
+
 - No se hace `git init` dentro de ninguna subcarpeta.
 - Este repositorio es **público**. Nunca se suben contraseñas, la llave de firma del APK ni datos personales reales; las pruebas usan solo datos ficticios o anonimizados (Ley N.º 21.719 y Ley N.º 19.628).
