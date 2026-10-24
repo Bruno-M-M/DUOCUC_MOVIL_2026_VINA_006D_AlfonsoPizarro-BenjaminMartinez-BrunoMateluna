@@ -19,7 +19,7 @@ import com.fundaciontextil.ui.theme.FundacionTextilTheme
 @Composable
 fun EjemploScreen(
     modifier: Modifier = Modifier,
-    viewModel: EjemploViewModel = viewModel(),
+    viewModel: EjemploViewModel = viewModel(factory = EjemploViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     EjemploContenido(
@@ -36,7 +36,9 @@ private fun EjemploContenido(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
