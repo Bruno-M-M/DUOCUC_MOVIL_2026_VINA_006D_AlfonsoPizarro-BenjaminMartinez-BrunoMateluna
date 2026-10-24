@@ -12,15 +12,15 @@ Esta app permite que las emprendedoras gestionen su perfil y su catálogo con fo
 
 ## Estado actual
 
-Está hecha la **base de la app**: el proyecto, el tema con los colores de la fundación y la navegación entre pantallas, con pantallas de prueba (también el modo invitado). Todavía **no hay** pantallas reales, base de datos local, conexión al servidor ni login de verdad.
+Está creada la **base de la app**: un proyecto nuevo de Android Studio (plantilla *Empty Activity*) con Jetpack Compose y Material 3. Todavía **no hay** pantallas, navegación, base de datos local ni conexión al servidor: cada funcionalidad se incorpora por historia de usuario, en su propia rama.
+
+La planificación del equipo (historias, responsables y avance) se lleva en **Trello**.
 
 ## Tecnologías
 
 - Kotlin, Android Studio, Jetpack Compose y Material Design 3
-- Navigation Compose
-- Arquitectura MVVM
-- Previstas: Room (datos sin conexión), Retrofit y un servidor en Spring Boot (API REST)
 - Android 9 o superior (`minSdk` 28)
+- Previstas: Navigation Compose, arquitectura MVVM, Room (datos sin conexión), Retrofit y un servidor en Spring Boot (API REST)
 
 ## Cómo abrir y ejecutar la app
 
@@ -39,14 +39,12 @@ android/   proyecto de la app (Android Studio)
 README.md  este archivo
 ```
 
-Dentro de `android/app/src/main/java/com/example/fundaciontextilcircular/`:
+Dentro de `android/app/src/main/java/com/fundaciontextil/`:
 
 | Carpeta o archivo | Qué contiene |
 |---|---|
 | `MainActivity.kt` | Punto de entrada de la app |
-| `ui/theme/` | Colores y tipografía de la fundación |
-| `ui/navigation/` | Rutas y navegación (`Rutas.kt`, `AppNav.kt`) |
-| `ui/components/` | Piezas reutilizables y pantallas de prueba |
+| `ui/theme/` | Colores, tipografía y tema Material 3 (por ahora los de la plantilla) |
 
 ## Normas del repositorio
 
