@@ -14,7 +14,7 @@ Esta app permite que las emprendedoras gestionen su perfil y su catálogo con fo
 
 Está creada la **base de la app**: un proyecto nuevo de Android Studio (plantilla *Empty Activity*) con Jetpack Compose y Material 3. Todavía **no hay** pantallas, navegación, base de datos local ni conexión al servidor: cada funcionalidad se incorpora por historia de usuario, en su propia rama.
 
-La planificación del equipo (historias, responsables y avance) se lleva en **Trello**.
+La planificación del equipo (historias, responsables y avance) se lleva en [**Trello**](https://trello.com/b/kFvJRnCK/federaciontextil).
 
 ## Tecnologías
 
