@@ -1,4 +1,4 @@
-package com.example.fundaciontextilcircular
+package com.fundaciontextil
 
 import org.junit.Test
 

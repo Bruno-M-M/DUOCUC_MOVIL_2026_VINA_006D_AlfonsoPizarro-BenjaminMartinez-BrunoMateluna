@@ -1,4 +1,4 @@
-package com.example.fundaciontextilcircular.ui.theme
+package com.fundaciontextil.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
