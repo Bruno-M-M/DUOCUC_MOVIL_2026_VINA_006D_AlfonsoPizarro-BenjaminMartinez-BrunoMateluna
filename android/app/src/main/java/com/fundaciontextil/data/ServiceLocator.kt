@@ -5,6 +5,8 @@ import com.fundaciontextil.data.local.AppDatabase
 import com.fundaciontextil.data.local.UsuarioDao
 import com.fundaciontextil.data.repository.PulsacionesRepository
 import com.fundaciontextil.data.repository.PulsacionesRepositoryEnMemoria
+import com.fundaciontextil.data.repository.UsuarioRepository
+import com.fundaciontextil.data.repository.UsuarioRepositoryLocal
 
 object ServiceLocator {
 
@@ -21,4 +23,6 @@ object ServiceLocator {
     val pulsacionesRepository: PulsacionesRepository by lazy {
         PulsacionesRepositoryEnMemoria()
     }
+
+    val usuarioRepository: UsuarioRepository by lazy { UsuarioRepositoryLocal(usuarioDao) }
 }
