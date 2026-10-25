@@ -1,58 +1,72 @@
 package com.fundaciontextil.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+import androidx.compose.ui.graphics.Color
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Turquesa,
+    onPrimary = Negro,
+    primaryContainer = Color(0xFFB4F0F2),
+    onPrimaryContainer = Negro,
+    secondary = Amarillo,
+    onSecondary = Negro,
+    secondaryContainer = Color(0xFFFFF199),
+    onSecondaryContainer = Negro,
+    tertiary = Negro,
+    onTertiary = Blanco,
+    background = Blanco,
+    onBackground = Negro,
+    surface = Blanco,
+    onSurface = Negro,
+    surfaceVariant = GrisClaro,
+    onSurfaceVariant = Negro,
+    surfaceContainerLowest = Blanco,
+    surfaceContainerLow = GrisClaro,
+    surfaceContainer = GrisClaro,
+    surfaceContainerHigh = Color(0xFFEDEDED),
+    surfaceContainerHighest = Color(0xFFE6E6E6),
+    outline = Color(0xFF6B6B6B),
+    outlineVariant = Color(0xFFCFCFCF),
+)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val DarkColorScheme = darkColorScheme(
+    primary = Turquesa,
+    onPrimary = Negro,
+    primaryContainer = Color(0xFF036C6E),
+    onPrimaryContainer = Blanco,
+    secondary = Amarillo,
+    onSecondary = Negro,
+    secondaryContainer = Color(0xFF665800),
+    onSecondaryContainer = Blanco,
+    tertiary = Blanco,
+    onTertiary = Negro,
+    background = Negro,
+    onBackground = Blanco,
+    surface = Negro,
+    onSurface = Blanco,
+    surfaceVariant = GrisOscuro,
+    onSurfaceVariant = Blanco,
+    surfaceContainerLowest = Negro,
+    surfaceContainerLow = Color(0xFF141414),
+    surfaceContainer = GrisOscuro,
+    surfaceContainerHigh = Color(0xFF262626),
+    surfaceContainerHighest = Color(0xFF303030),
+    outline = Color(0xFF9A9A9A),
+    outlineVariant = Color(0xFF444444),
 )
 
 @Composable
 fun FundacionTextilTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }
