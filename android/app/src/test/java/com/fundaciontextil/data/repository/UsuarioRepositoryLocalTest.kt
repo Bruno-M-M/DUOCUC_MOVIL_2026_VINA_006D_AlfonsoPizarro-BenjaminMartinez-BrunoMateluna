@@ -1,7 +1,5 @@
 package com.fundaciontextil.data.repository
 
-import com.fundaciontextil.data.local.UsuarioDao
-import com.fundaciontextil.data.local.UsuarioEntity
 import com.fundaciontextil.data.model.EstadoCuenta
 import com.fundaciontextil.data.model.ResultadoInicioSesion
 import com.fundaciontextil.data.model.ResultadoRegistro
@@ -13,23 +11,6 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-
-// Un DAO "de mentira" que guarda las filas en una lista, para probar sin base de datos ni emulador.
-private class DaoFalso : UsuarioDao {
-    val filas = mutableListOf<UsuarioEntity>()
-
-    override suspend fun insertar(usuario: UsuarioEntity): Long {
-        val id = filas.size + 1L
-        filas += usuario.copy(id = id)
-        return id
-    }
-
-    override suspend fun buscarPorCorreo(correo: String) = filas.firstOrNull { it.correo == correo }
-
-    override suspend fun buscarPorRutHash(rutHash: String) = filas.firstOrNull { it.rutHash == rutHash }
-
-    override suspend fun buscarPorId(id: Long) = filas.firstOrNull { it.id == id }
-}
 
 class UsuarioRepositoryLocalTest {
 
