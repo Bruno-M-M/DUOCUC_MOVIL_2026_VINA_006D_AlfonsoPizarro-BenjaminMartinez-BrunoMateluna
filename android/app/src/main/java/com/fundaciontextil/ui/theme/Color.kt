@@ -2,10 +2,11 @@ package com.fundaciontextil.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Paleta de colores de la fundacion
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Turquesa = Color(0xFF05C9CD)
+val Amarillo = Color(0xFFFFDF01)
+val Negro = Color(0xFF000000)
+val Blanco = Color(0xFFFFFFFF)
+val GrisClaro = Color(0xFFF4F4F4)
+val GrisOscuro = Color(0xFF1C1C1C)
