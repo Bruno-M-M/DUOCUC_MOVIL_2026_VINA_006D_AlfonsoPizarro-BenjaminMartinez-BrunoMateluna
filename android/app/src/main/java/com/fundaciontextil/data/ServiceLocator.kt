@@ -3,7 +3,10 @@ package com.fundaciontextil.data
 import android.content.Context
 import com.fundaciontextil.data.local.AlmacenSesionPreferencias
 import com.fundaciontextil.data.local.AppDatabase
+import com.fundaciontextil.data.local.CatalogoDao
 import com.fundaciontextil.data.local.UsuarioDao
+import com.fundaciontextil.data.repository.CatalogoRepository
+import com.fundaciontextil.data.repository.CatalogoRepositoryLocal
 import com.fundaciontextil.data.repository.PulsacionesRepository
 import com.fundaciontextil.data.repository.PulsacionesRepositoryEnMemoria
 import com.fundaciontextil.data.repository.SesionRepository
@@ -23,11 +26,15 @@ object ServiceLocator {
 
     val usuarioDao: UsuarioDao by lazy { baseDeDatos.usuarioDao() }
 
+    val catalogoDao: CatalogoDao by lazy { baseDeDatos.catalogoDao() }
+
     val pulsacionesRepository: PulsacionesRepository by lazy {
         PulsacionesRepositoryEnMemoria()
     }
 
     val usuarioRepository: UsuarioRepository by lazy { UsuarioRepositoryLocal(usuarioDao) }
+
+    val catalogoRepository: CatalogoRepository by lazy { CatalogoRepositoryLocal(catalogoDao) }
 
     val sesionRepository: SesionRepository by lazy {
         SesionRepository(usuarioRepository, AlmacenSesionPreferencias(contexto))
