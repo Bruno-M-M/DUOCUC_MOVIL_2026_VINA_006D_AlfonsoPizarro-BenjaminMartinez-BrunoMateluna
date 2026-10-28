@@ -80,6 +80,7 @@ internal fun LoginContenido(
             tipo = TipoCampo.CORREO,
             error = uiState.errorCorreo,
             esValido = uiState.correoTocado && uiState.errorCorreo == null,
+            marcarError = uiState.errorCredenciales != null,
             habilitado = !uiState.cargando,
         )
         Spacer(Modifier.height(8.dp))
@@ -89,6 +90,7 @@ internal fun LoginContenido(
             etiqueta = "Contraseña",
             tipo = TipoCampo.CLAVE,
             error = uiState.errorClave,
+            marcarError = uiState.errorCredenciales != null,
             habilitado = !uiState.cargando,
             accionIme = ImeAction.Done,
         )
