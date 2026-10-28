@@ -19,6 +19,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
     abstract fun catalogoDao(): CatalogoDao
 
+    abstract fun solicitudEmprendedoraDao(): SolicitudEmprendedoraDao
+
     companion object {
         fun crear(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "fundacion_textil.db")
