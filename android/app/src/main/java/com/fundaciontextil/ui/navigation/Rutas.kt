@@ -7,6 +7,8 @@ object Rutas {
     const val LOGIN = "login"
     const val REGISTRO = "registro"
 
+    const val RECUPERAR_CLAVE = "recuperar_clave"
+
     // Las 4 pestañas de la barra inferior
     const val EXPLORAR = "explorar"
     const val MENSAJES = "mensajes"

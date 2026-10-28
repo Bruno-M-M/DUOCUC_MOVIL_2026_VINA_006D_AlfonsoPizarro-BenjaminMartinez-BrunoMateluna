@@ -54,6 +54,7 @@ fun Campo(
     tipo: TipoCampo = TipoCampo.TEXTO,
     error: String? = null,
     esValido: Boolean = false,
+    marcarError: Boolean = false,
     habilitado: Boolean = true,
     accionIme: ImeAction = ImeAction.Next,
 ) {
@@ -94,7 +95,7 @@ fun Campo(
                 }
             }
         },
-        isError = error != null,
+        isError = error != null || marcarError,
         singleLine = true,
         visualTransformation = if (esClave && !claveVisible) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
