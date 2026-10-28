@@ -2,7 +2,7 @@ package com.fundaciontextil.ui.navigation
 
 import com.fundaciontextil.ui.components.Accion
 import com.fundaciontextil.ui.components.PantallaDemo
-
+import com.fundaciontextil.ui.auth.LoginScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -38,7 +38,7 @@ private val pestanas = listOf(
 )
 
 // Pantallas donde NO se muestra la barra inferior
-private val sinBarra = setOf(Rutas.ACCESO, Rutas.LOGIN, Rutas.REGISTRO)
+private val sinBarra = setOf(Rutas.ACCESO, Rutas.LOGIN, Rutas.REGISTRO, Rutas.RECUPERAR_CLAVE)
 
 // Qué pestaña se ve marcada según la pantalla en que estamos (un detalle pertenece a su pestaña)
 private fun pestanaActiva(ruta: String?): String? = when {
@@ -122,13 +122,16 @@ fun AppNav() {
                 )
             }
             composable(Rutas.LOGIN) {
+                LoginScreen(
+                    alIniciarSesion = { terminarAcceso() },
+                    alIrARegistro = { navController.navigate(Rutas.REGISTRO) },
+                    alOlvidarClave = { navController.navigate(Rutas.RECUPERAR_CLAVE) }
+                )
+            }
+            composable(Rutas.RECUPERAR_CLAVE) {
                 PantallaDemo(
-                    "Iniciar sesión",
-                    listOf(
-                        Accion("Entrar (simula login correcto)") { terminarAcceso() },
-                        Accion("No tengo cuenta") { navController.navigate(Rutas.REGISTRO) },
-                        Accion("Volver") { navController.popBackStack() },
-                    ),
+                    "Recuperar contraseña",
+                    listOf(Accion("Volver") { navController.popBackStack() }),
                 )
             }
             composable(Rutas.REGISTRO) {
