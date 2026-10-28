@@ -3,6 +3,7 @@ package com.fundaciontextil
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import com.fundaciontextil.data.ServiceLocator
+import com.fundaciontextil.data.local.DatosDeCatalogo
 import com.fundaciontextil.data.local.DatosDePrueba
 
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,9 @@ class TextilApp : Application() {
     override fun onCreate() {
         super.onCreate()
         ServiceLocator.iniciar(this)
+
+        // El catálogo se carga siempre, pero solo si la tabla está vacía (primer arranque)
+        ambito.launch { DatosDeCatalogo(ServiceLocator.catalogoDao).cargarSiHaceFalta() }
 
         val esDepurable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         if (esDepurable) {

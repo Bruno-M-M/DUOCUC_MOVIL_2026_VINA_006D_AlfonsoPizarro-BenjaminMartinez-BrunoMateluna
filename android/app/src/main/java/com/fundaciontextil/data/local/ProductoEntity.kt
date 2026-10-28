@@ -5,20 +5,20 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity("productos",
+@Entity(
+    tableName = "productos",
     foreignKeys = [ForeignKey(
-        entity = EmprendedoraEntity :: class,
+        entity = EmprendedoraEntity::class,
         parentColumns = ["id"],
         childColumns = ["emprendedoraId"],
         onDelete = ForeignKey.CASCADE,
     )],
-    indices = [Index("emprendedoraid")]
-
+    indices = [Index("emprendedoraId")],
 )
-data class ProductoEntity (
-    @PrimaryKey(autoGenerate = true) val id : Long = 0,
+data class ProductoEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val emprendedoraId: Long,
     val nombre: String,
-    val descipcion: String,
-    val precio : Int,
+    val descripcion: String,
+    val precio: Int,
 )
