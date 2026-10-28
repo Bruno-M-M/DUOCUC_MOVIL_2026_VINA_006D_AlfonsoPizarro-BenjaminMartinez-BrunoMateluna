@@ -36,6 +36,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fundaciontextil.ui.components.Campo
 import com.fundaciontextil.ui.components.TipoCampo
 import com.fundaciontextil.ui.theme.FundacionTextilTheme
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 
 @Composable
 fun RegistroScreen(
@@ -149,8 +152,12 @@ internal fun RegistroContenido(
         TextButton(onClick = { verTerminos = true }) {
             Text("Leer términos y política de privacidad")
         }
-        uiState.errorTerminos?.let { mensaje ->
-            Text(mensaje, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        AnimatedVisibility(visible = uiState.errorTerminos != null, enter = fadeIn() + expandVertically()) {
+            Text(
+                RegistroUiState.MENSAJE_TERMINOS,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
 
         Spacer(Modifier.height(16.dp))
