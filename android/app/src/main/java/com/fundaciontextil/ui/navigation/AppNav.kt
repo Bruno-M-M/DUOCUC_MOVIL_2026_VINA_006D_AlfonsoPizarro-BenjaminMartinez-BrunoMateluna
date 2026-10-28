@@ -6,6 +6,7 @@ import com.fundaciontextil.ui.components.Accion
 import com.fundaciontextil.ui.components.PantallaDemo
 import com.fundaciontextil.ui.auth.LoginScreen
 import com.fundaciontextil.ui.auth.RegistroScreen
+import com.fundaciontextil.ui.auth.RegistroEmprendedoraScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -40,7 +41,7 @@ private val pestanas = listOf(
     Pestana(Rutas.PERFIL, "Perfil", Icons.Default.Person),
 )
 
-private val sinBarra = setOf(Rutas.ACCESO, Rutas.LOGIN, Rutas.REGISTRO, Rutas.RECUPERAR_CLAVE)
+private val sinBarra = setOf(Rutas.ACCESO, Rutas.LOGIN, Rutas.REGISTRO, Rutas.REGISTRO_EMPRENDEDORA, Rutas.RECUPERAR_CLAVE)
 
 private fun pestanaActiva(ruta: String?): String? = when {
     ruta == null -> null
@@ -109,15 +110,16 @@ fun AppNav() {
                     listOf(
                         Accion("Iniciar sesión") { navController.navigate(Rutas.LOGIN) },
                         Accion("Crear cuenta") { navController.navigate(Rutas.REGISTRO) },
+                        Accion("Soy emprendedora: quiero registrarme") {
+                            navController.navigate(Rutas.REGISTRO_EMPRENDEDORA)
+                        },
                         Accion("Continuar como invitado") { irAExplorar() },
                     ),
                 )
             }
-            // ---------- Splash (ruta inicial) ----------
             composable(Rutas.SPLASH) {
                 SplashScreen(
                     alTerminar = { conSesion ->
-                        // Con sesión guardada se entra directo; si no, se muestra el acceso.
                         haySesion = conSesion
                         navController.navigate(if (conSesion) Rutas.EXPLORAR else Rutas.ACCESO) {
                             popUpTo(Rutas.SPLASH) { inclusive = true }
@@ -149,7 +151,17 @@ fun AppNav() {
                     },
                 )
             }
-
+            composable(Rutas.REGISTRO_EMPRENDEDORA) {
+                RegistroEmprendedoraScreen(
+                    alContinuar = { terminarAcceso() },
+                    alIrALogin = {
+                        navController.navigate(Rutas.LOGIN) {
+                            popUpTo(Rutas.REGISTRO_EMPRENDEDORA) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                )
+            }
             composable(Rutas.EXPLORAR) {
                 PantallaDemo(
                     "Explorar: lista de emprendedoras",
