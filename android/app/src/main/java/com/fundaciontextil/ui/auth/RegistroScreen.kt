@@ -75,9 +75,6 @@ internal fun RegistroContenido(
     alIrALogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var verTerminos by rememberSaveable { mutableStateOf(false) }
-    val habilitado = !uiState.cargando
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -88,77 +85,15 @@ internal fun RegistroContenido(
         Text("Crear cuenta", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(24.dp))
 
-        Campo(
-            valor = uiState.nombre,
-            alCambiar = alCambiarNombre,
-            etiqueta = "Nombre completo",
-            tipo = TipoCampo.NOMBRE,
-            error = uiState.errorNombre,
-            esValido = CampoRegistro.NOMBRE in uiState.tocados && uiState.errorNombre == null,
-            habilitado = habilitado,
+        CamposDeCuenta(
+            uiState = uiState,
+            alCambiarNombre = alCambiarNombre,
+            alCambiarCorreo = alCambiarCorreo,
+            alCambiarRut = alCambiarRut,
+            alCambiarClave = alCambiarClave,
+            alCambiarRepetirClave = alCambiarRepetirClave,
+            alCambiarTerminos = alCambiarTerminos,
         )
-        Campo(
-            valor = uiState.correo,
-            alCambiar = alCambiarCorreo,
-            etiqueta = "Correo electrónico",
-            tipo = TipoCampo.CORREO,
-            error = uiState.errorCorreo,
-            esValido = CampoRegistro.CORREO in uiState.tocados && uiState.errorCorreo == null,
-            habilitado = habilitado,
-        )
-        Campo(
-            valor = uiState.rut,
-            alCambiar = alCambiarRut,
-            etiqueta = "RUT (ej: 12.345.678-5)",
-            tipo = TipoCampo.RUT,
-            error = uiState.errorRut,
-            esValido = CampoRegistro.RUT in uiState.tocados && uiState.errorRut == null,
-            habilitado = habilitado,
-        )
-        Campo(
-            valor = uiState.clave,
-            alCambiar = alCambiarClave,
-            etiqueta = "Contraseña",
-            tipo = TipoCampo.CLAVE,
-            error = uiState.errorClave,
-            habilitado = habilitado,
-        )
-        Campo(
-            valor = uiState.repetirClave,
-            alCambiar = alCambiarRepetirClave,
-            etiqueta = "Repetir contraseña",
-            tipo = TipoCampo.CLAVE,
-            error = uiState.errorRepetirClave,
-            habilitado = habilitado,
-            accionIme = ImeAction.Done,
-        )
-
-        Spacer(Modifier.height(8.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .toggleable(
-                    value = uiState.aceptaTerminos,
-                    enabled = habilitado,
-                    role = Role.Checkbox,
-                    onValueChange = alCambiarTerminos,
-                ),
-        ) {
-            Checkbox(checked = uiState.aceptaTerminos, onCheckedChange = null, enabled = habilitado)
-            Spacer(Modifier.width(8.dp))
-            Text("Acepto los términos y la política de privacidad")
-        }
-        TextButton(onClick = { verTerminos = true }) {
-            Text("Leer términos y política de privacidad")
-        }
-        AnimatedVisibility(visible = uiState.errorTerminos != null, enter = fadeIn() + expandVertically()) {
-            Text(
-                RegistroUiState.MENSAJE_TERMINOS,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
 
         Spacer(Modifier.height(16.dp))
         Button(
@@ -179,6 +114,92 @@ internal fun RegistroContenido(
         TextButton(onClick = alIrALogin, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text("¿Ya tienes cuenta? Inicia sesión")
         }
+    }
+}
+
+@Composable
+internal fun CamposDeCuenta(
+    uiState: RegistroUiState,
+    alCambiarNombre: (String) -> Unit,
+    alCambiarCorreo: (String) -> Unit,
+    alCambiarRut: (String) -> Unit,
+    alCambiarClave: (String) -> Unit,
+    alCambiarRepetirClave: (String) -> Unit,
+    alCambiarTerminos: (Boolean) -> Unit,
+) {
+    var verTerminos by rememberSaveable { mutableStateOf(false) }
+    val habilitado = !uiState.cargando
+
+    Campo(
+        valor = uiState.nombre,
+        alCambiar = alCambiarNombre,
+        etiqueta = "Nombre completo",
+        tipo = TipoCampo.NOMBRE,
+        error = uiState.errorNombre,
+        esValido = CampoRegistro.NOMBRE in uiState.tocados && uiState.errorNombre == null,
+        habilitado = habilitado,
+    )
+    Campo(
+        valor = uiState.correo,
+        alCambiar = alCambiarCorreo,
+        etiqueta = "Correo electrónico",
+        tipo = TipoCampo.CORREO,
+        error = uiState.errorCorreo,
+        esValido = CampoRegistro.CORREO in uiState.tocados && uiState.errorCorreo == null,
+        habilitado = habilitado,
+    )
+    Campo(
+        valor = uiState.rut,
+        alCambiar = alCambiarRut,
+        etiqueta = "RUT (ej: 12.345.678-5)",
+        tipo = TipoCampo.RUT,
+        error = uiState.errorRut,
+        esValido = CampoRegistro.RUT in uiState.tocados && uiState.errorRut == null,
+        habilitado = habilitado,
+    )
+    Campo(
+        valor = uiState.clave,
+        alCambiar = alCambiarClave,
+        etiqueta = "Contraseña",
+        tipo = TipoCampo.CLAVE,
+        error = uiState.errorClave,
+        habilitado = habilitado,
+    )
+    Campo(
+        valor = uiState.repetirClave,
+        alCambiar = alCambiarRepetirClave,
+        etiqueta = "Repetir contraseña",
+        tipo = TipoCampo.CLAVE,
+        error = uiState.errorRepetirClave,
+        habilitado = habilitado,
+        accionIme = ImeAction.Done,
+    )
+
+    Spacer(Modifier.height(8.dp))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .toggleable(
+                value = uiState.aceptaTerminos,
+                enabled = habilitado,
+                role = Role.Checkbox,
+                onValueChange = alCambiarTerminos,
+            ),
+    ) {
+        Checkbox(checked = uiState.aceptaTerminos, onCheckedChange = null, enabled = habilitado)
+        Spacer(Modifier.width(8.dp))
+        Text("Acepto los términos y la política de privacidad")
+    }
+    TextButton(onClick = { verTerminos = true }) {
+        Text("Leer términos y política de privacidad")
+    }
+    AnimatedVisibility(visible = uiState.errorTerminos != null, enter = fadeIn() + expandVertically()) {
+        Text(
+            RegistroUiState.MENSAJE_TERMINOS,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 
     if (verTerminos) {
