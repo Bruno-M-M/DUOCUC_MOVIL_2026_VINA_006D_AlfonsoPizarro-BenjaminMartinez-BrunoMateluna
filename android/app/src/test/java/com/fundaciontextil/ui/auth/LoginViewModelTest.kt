@@ -13,13 +13,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Before
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -44,7 +44,7 @@ class LoginViewModelTest {
     }
 
     private fun escribir(correo: String, clave: String) {
-        viewModel.alCambiarClave(correo)
+        viewModel.alCambiarCorreo(correo)
         viewModel.alCambiarClave(clave)
     }
 
