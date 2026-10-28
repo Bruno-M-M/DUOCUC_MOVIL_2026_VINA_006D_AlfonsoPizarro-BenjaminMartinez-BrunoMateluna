@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.fundaciontextil.ui.navigation.AppNav
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import com.fundaciontextil.ui.navigation.AppNavigation
 import com.fundaciontextil.ui.theme.FundacionTextilTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +16,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FundacionTextilTheme {
-                AppNav()
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    AppNavigation()
+                }
             }
         }
     }
