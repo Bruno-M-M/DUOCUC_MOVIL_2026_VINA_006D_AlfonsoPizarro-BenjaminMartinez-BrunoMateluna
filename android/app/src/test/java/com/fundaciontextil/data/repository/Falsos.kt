@@ -9,6 +9,8 @@ import com.fundaciontextil.data.local.UsuarioEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import com.fundaciontextil.data.local.SolicitudEmprendedoraDao
+import com.fundaciontextil.data.local.SolicitudEmprendedoraEntity
 
 internal class DaoFalso : UsuarioDao {
     val filas = mutableListOf<UsuarioEntity>()
@@ -66,4 +68,14 @@ internal class CatalogoDaoFalso : CatalogoDao {
     }
 
     override suspend fun contarEmprendedoras(): Int = emprendedorasFlow.value.size
+}
+
+internal class SolicitudEmprendedoraDaoFalso : SolicitudEmprendedoraDao {
+    val filas = mutableListOf<SolicitudEmprendedoraEntity>()
+
+    override suspend fun insertar(solicitud: SolicitudEmprendedoraEntity) {
+        filas += solicitud
+    }
+
+    override suspend fun buscarPorUsuario(usuarioId: Long) = filas.firstOrNull { it.usuarioId == usuarioId }
 }

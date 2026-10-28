@@ -7,7 +7,7 @@ object Rutas {
     const val ACCESO = "acceso"
     const val LOGIN = "login"
     const val REGISTRO = "registro"
-
+    const val REGISTRO_EMPRENDEDORA = "registro_emprendedora"
     const val RECUPERAR_CLAVE = "recuperar_clave"
 
     // Las 4 pestañas de la barra inferior
