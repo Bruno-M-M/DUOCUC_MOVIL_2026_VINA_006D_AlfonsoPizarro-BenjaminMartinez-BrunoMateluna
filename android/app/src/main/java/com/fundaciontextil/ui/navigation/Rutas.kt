@@ -3,6 +3,7 @@ package com.fundaciontextil.ui.navigation
 // Un solo lugar con todos los nombres de ruta, para no escribir textos sueltos por el código.
 object Rutas {
     // Antes de entrar a la app (sin barra inferior)
+    const val SPLASH = "splash"
     const val ACCESO = "acceso"
     const val LOGIN = "login"
     const val REGISTRO = "registro"
