@@ -85,7 +85,7 @@ internal fun LoginContenido(
         Spacer(Modifier.height(8.dp))
         Campo(
             valor = uiState.clave,
-            alCambiar = alCambiarCorreo,
+            alCambiar = alCambiarClave,
             etiqueta = "Contraseña",
             tipo = TipoCampo.CLAVE,
             error = uiState.errorClave,
@@ -113,23 +113,17 @@ internal fun LoginContenido(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
-                    Text("Ingresando...")
+                    Text("Ingresando…")
                 }
             } else {
                 Text("Ingresar")
             }
         }
 
-        TextButton(
-            onClick = alOlvidarClave,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
+        TextButton(onClick = alOlvidarClave, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text("¿Olvidaste tu contraseña?")
         }
-        TextButton(
-            onClick = alIrARegistro,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
+        TextButton(onClick = alIrARegistro, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text("¿No tienes cuenta? Crear cuenta")
         }
     }
