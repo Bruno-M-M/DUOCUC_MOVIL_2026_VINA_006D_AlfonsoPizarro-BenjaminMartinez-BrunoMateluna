@@ -35,6 +35,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.runtime.remember
 
 enum class TipoCampo(val icono: ImageVector) {
     TEXTO(Icons.Default.Create),
@@ -82,19 +87,7 @@ fun Campo(
                 )
             }
         },
-        supportingText = error?.let { mensaje ->
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = "Campo con error",
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(mensaje)
-                }
-            }
-        },
+        supportingText = error?.let { mensaje -> { MensajeDeError(mensaje) } },
         isError = error != null || marcarError,
         singleLine = true,
         visualTransformation = if (esClave && !claveVisible) PasswordVisualTransformation() else VisualTransformation.None,
@@ -109,4 +102,20 @@ fun Campo(
             imeAction = accionIme,
         ),
     )
+}
+
+@Composable
+private fun MensajeDeError(mensaje: String) {
+    val visibilidad = remember { MutableTransitionState(false).apply { targetState = true } }
+    AnimatedVisibility(visibleState = visibilidad, enter = fadeIn() + expandVertically()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = "Campo con error",
+                modifier = Modifier.size(16.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(mensaje)
+        }
+    }
 }
