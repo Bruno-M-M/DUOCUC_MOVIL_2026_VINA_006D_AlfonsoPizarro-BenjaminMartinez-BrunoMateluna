@@ -3,6 +3,7 @@ package com.fundaciontextil.ui.navigation
 import com.fundaciontextil.ui.components.Accion
 import com.fundaciontextil.ui.components.PantallaDemo
 import com.fundaciontextil.ui.auth.LoginScreen
+import com.fundaciontextil.ui.auth.RegistroScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -37,10 +38,8 @@ private val pestanas = listOf(
     Pestana(Rutas.PERFIL, "Perfil", Icons.Default.Person),
 )
 
-// Pantallas donde NO se muestra la barra inferior
 private val sinBarra = setOf(Rutas.ACCESO, Rutas.LOGIN, Rutas.REGISTRO, Rutas.RECUPERAR_CLAVE)
 
-// Qué pestaña se ve marcada según la pantalla en que estamos (un detalle pertenece a su pestaña)
 private fun pestanaActiva(ruta: String?): String? = when {
     ruta == null -> null
     ruta.startsWith("emprendedora") || ruta.startsWith("producto") -> Rutas.EXPLORAR
@@ -52,30 +51,24 @@ private fun pestanaActiva(ruta: String?): String? = when {
 fun AppNav() {
     val navController = rememberNavController()
 
-    // Invitado = false, cliente con cuenta = true. Cuando tengan login real,
-    // esto sale de un ViewModel (SessionViewModel) y no de una variable local.
     var haySesion by rememberSaveable { mutableStateOf(false) }
 
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
     val mostrarBarra = rutaActual != null && rutaActual !in sinBarra
 
-    // Entrar a la app: se borra la pantalla de acceso para que "atrás" salga de la app
     fun irAExplorar() {
         navController.navigate(Rutas.EXPLORAR) {
             popUpTo(Rutas.ACCESO) { inclusive = true }
         }
     }
 
-    // Se llama cuando el login o el registro salen bien
     fun terminarAcceso() {
         haySesion = true
         val vinoDelAcceso = runCatching { navController.getBackStackEntry(Rutas.ACCESO) }.isSuccess
         if (vinoDelAcceso) {
             irAExplorar()
         } else {
-            // Venía desde dentro de la app (p. ej. del botón "comunicarse"): al cerrar
-            // registro/login, la pantalla anterior queda a la vista, es decir, vuelve a la emprendedora.
             navController.popBackStack(Rutas.REGISTRO, inclusive = true)
             navController.popBackStack(Rutas.LOGIN, inclusive = true)
         }
@@ -90,8 +83,6 @@ fun AppNav() {
                             selected = pestanaActiva(rutaActual) == pestana.ruta,
                             onClick = {
                                 navController.navigate(pestana.ruta) {
-                                    // Al cambiar de pestaña no se apilan pantallas: se vuelve a la base
-                                    // y se recuerda en qué punto estaba cada pestaña.
                                     popUpTo(Rutas.EXPLORAR) { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
@@ -110,7 +101,6 @@ fun AppNav() {
             startDestination = Rutas.ACCESO,
             modifier = Modifier.padding(padding),
         ) {
-            // ---------- Acceso ----------
             composable(Rutas.ACCESO) {
                 PantallaDemo(
                     "Bienvenida/o",
@@ -135,16 +125,17 @@ fun AppNav() {
                 )
             }
             composable(Rutas.REGISTRO) {
-                PantallaDemo(
-                    "Crear cuenta de cliente",
-                    listOf(
-                        Accion("Registrarme (simula registro correcto)") { terminarAcceso() },
-                        Accion("Volver") { navController.popBackStack() },
-                    ),
+                RegistroScreen(
+                    alRegistrarse = { terminarAcceso() },
+                    alIrALogin = {
+                        navController.navigate(Rutas.LOGIN) {
+                            popUpTo(Rutas.REGISTRO) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
 
-            // ---------- Pestaña Explorar ----------
             composable(Rutas.EXPLORAR) {
                 PantallaDemo(
                     "Explorar: lista de emprendedoras",
@@ -176,7 +167,6 @@ fun AppNav() {
                     "Detalle del producto $id",
                     listOf(
                         Accion("Comunicarme con la emprendedora") {
-                            // Con sesión: abre el chat. Invitado: va al login, y al terminar vuelve aquí.
                             if (haySesion) navController.navigate(Rutas.chat(1))
                             else navController.navigate(Rutas.LOGIN)
                         },
@@ -185,7 +175,6 @@ fun AppNav() {
                 )
             }
 
-            // ---------- Pestaña Mensajes ----------
             composable(Rutas.MENSAJES) {
                 if (haySesion) {
                     PantallaDemo(
@@ -208,10 +197,8 @@ fun AppNav() {
                 PantallaDemo("Conversación $id", listOf(Accion("Volver") { navController.popBackStack() }))
             }
 
-            // ---------- Pestaña Novedades ----------
             composable(Rutas.NOVEDADES) { PantallaDemo("Novedades (lo ven todos, también el invitado)") }
 
-            // ---------- Pestaña Perfil ----------
             composable(Rutas.PERFIL) {
                 if (haySesion) {
                     PantallaDemo("Mi perfil", listOf(Accion("Cerrar sesión") { haySesion = false }))
@@ -227,7 +214,6 @@ fun AppNav() {
     }
 }
 
-// Misma ruta, distinto contenido: el invitado ve esto en Mensajes y Perfil
 @Composable
 private fun PedirSesion(mensaje: String, irALogin: () -> Unit, irARegistro: () -> Unit) {
     PantallaDemo(
