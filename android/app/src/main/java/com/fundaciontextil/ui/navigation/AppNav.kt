@@ -1,5 +1,7 @@
 package com.fundaciontextil.ui.navigation
 
+import com.fundaciontextil.data.ServiceLocator
+import com.fundaciontextil.ui.splash.SplashScreen
 import com.fundaciontextil.ui.components.Accion
 import com.fundaciontextil.ui.components.PantallaDemo
 import com.fundaciontextil.ui.auth.LoginScreen
@@ -55,7 +57,7 @@ fun AppNav() {
 
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
-    val mostrarBarra = rutaActual != null && rutaActual !in sinBarra
+    val mostrarBarra = rutaActual != null && rutaActual != Rutas.SPLASH && rutaActual !in sinBarra
 
     fun irAExplorar() {
         navController.navigate(Rutas.EXPLORAR) {
@@ -98,7 +100,7 @@ fun AppNav() {
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Rutas.ACCESO,
+            startDestination = Rutas.SPLASH,
             modifier = Modifier.padding(padding),
         ) {
             composable(Rutas.ACCESO) {
@@ -109,6 +111,18 @@ fun AppNav() {
                         Accion("Crear cuenta") { navController.navigate(Rutas.REGISTRO) },
                         Accion("Continuar como invitado") { irAExplorar() },
                     ),
+                )
+            }
+            // ---------- Splash (ruta inicial) ----------
+            composable(Rutas.SPLASH) {
+                SplashScreen(
+                    alTerminar = { conSesion ->
+                        // Con sesión guardada se entra directo; si no, se muestra el acceso.
+                        haySesion = conSesion
+                        navController.navigate(if (conSesion) Rutas.EXPLORAR else Rutas.ACCESO) {
+                            popUpTo(Rutas.SPLASH) { inclusive = true }
+                        }
+                    },
                 )
             }
             composable(Rutas.LOGIN) {
@@ -201,7 +215,16 @@ fun AppNav() {
 
             composable(Rutas.PERFIL) {
                 if (haySesion) {
-                    PantallaDemo("Mi perfil", listOf(Accion("Cerrar sesión") { haySesion = false }))
+                    PantallaDemo(
+                        "Mi perfil",
+                        listOf(
+                            Accion("Cerrar sesión") {
+                                // Se borra la sesión guardada; si no, el splash volvería a entrar solo.
+                                ServiceLocator.sesionRepository.cerrarSesion()
+                                haySesion = false
+                            },
+                        ),
+                    )
                 } else {
                     PedirSesion(
                         "Inicia sesión o crea tu cuenta",
