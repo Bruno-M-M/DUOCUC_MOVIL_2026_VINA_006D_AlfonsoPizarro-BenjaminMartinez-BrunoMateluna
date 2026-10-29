@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fundaciontextil.ui.permisos.rememberPermisoCamara
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -54,6 +55,17 @@ fun FotoPerfilSeccion(
     }
     val lanzarGaleria = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         viewModel.alElegirDeGaleria(uri)
+    }
+
+    val pedirCamara = rememberPermisoCamara {
+        val destino = viewModel.crearDestinoCamara() ?: return@rememberPermisoCamara
+        rutaCamara = destino.archivo.absolutePath
+        try {
+            lanzarCamara.launch(destino.uri)
+        } catch (e: ActivityNotFoundException) { // emulador sin app de cámara
+            rutaCamara = null
+            viewModel.alFallarCamara(destino.archivo)
+        }
     }
 
     if (estado.cargando || !estado.puedeEditar) return
@@ -87,16 +99,7 @@ fun FotoPerfilSeccion(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
                 enabled = !ocupado,
-                onClick = {
-                    val destino = viewModel.crearDestinoCamara() ?: return@OutlinedButton
-                    rutaCamara = destino.archivo.absolutePath
-                    try {
-                        lanzarCamara.launch(destino.uri)
-                    } catch (e: ActivityNotFoundException) { // emulador sin app de cámara
-                        rutaCamara = null
-                        viewModel.alFallarCamara(destino.archivo)
-                    }
-                },
+                onClick = pedirCamara,
             ) { Text("Tomar foto") }
 
             OutlinedButton(

@@ -24,7 +24,7 @@ object Rutas {
     const val CHAT = "chat/{chatId}"
 
     // Para navegar a un detalle se arma la ruta con el id real
-    fun emprendedora(id: Int) = "emprendedora/$id"
+    fun emprendedora(id: Long) = "emprendedora/$id"
     fun producto(id: Int) = "producto/$id"
     fun chat(id: Int) = "chat/$id"
 }

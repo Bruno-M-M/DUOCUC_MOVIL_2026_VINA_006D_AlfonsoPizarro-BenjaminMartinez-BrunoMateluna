@@ -168,19 +168,19 @@ fun AppNav() {
                 PantallaDemo(
                     "Explorar: lista de emprendedoras",
                     listOf(
-                        Accion("Ver emprendedora 1") { navController.navigate(Rutas.emprendedora(1)) },
-                        Accion("Ver emprendedora 2") { navController.navigate(Rutas.emprendedora(2)) },
+                        Accion("Ver emprendedora 1") { navController.navigate(Rutas.emprendedora(1L)) },
+                        Accion("Ver emprendedora 2") { navController.navigate(Rutas.emprendedora(2L)) },
                     ),
                 )
             }
             composable(
                 Rutas.EMPRENDEDORA,
-                arguments = listOf(navArgument("emprendedoraId") { type = NavType.IntType }),
+                arguments = listOf(navArgument("emprendedoraId") { type = NavType.LongType }),
             ) { entrada ->
-                val id = entrada.arguments?.getInt("emprendedoraId") ?: 0
+                val id = entrada.arguments?.getLong("emprendedoraId") ?: 0L
                 // NUEVO: catálogo real con fotos; lo ve cualquiera, también el invitado
                 CatalogoEmprendedoraScreen(
-                    emprendedoraId = id.toLong(),
+                    emprendedoraId = id,
                     alVolver = { navController.popBackStack() },
                 )
             }
