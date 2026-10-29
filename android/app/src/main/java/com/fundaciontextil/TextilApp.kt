@@ -19,8 +19,9 @@ class TextilApp : Application() {
         super.onCreate()
         ServiceLocator.iniciar(this)
 
-        // El catálogo se carga siempre, pero solo si la tabla está vacía (primer arranque)
         ambito.launch { DatosDeCatalogo(ServiceLocator.catalogoDao).cargarSiHaceFalta() }
+
+        ambito.launch { ServiceLocator.fotoPerfilRepository.limpiarHuerfanos() }
 
         val esDepurable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         if (esDepurable) {

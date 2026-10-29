@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -110,7 +111,10 @@ fun FotoPerfilSeccion(viewModel: FotoViewModel = viewModel(factory = FotoViewMod
 
         estado.mensaje?.let {
             Text(it, style = MaterialTheme.typography.bodyMedium)
-            LaunchedEffect(it) { viewModel.mensajeMostrado() }
+            LaunchedEffect(it) {
+                delay(3_000)
+                viewModel.mensajeMostrado()
+            }
         }
     }
 }

@@ -8,6 +8,8 @@ import com.fundaciontextil.ui.auth.LoginScreen
 import com.fundaciontextil.ui.auth.RegistroScreen
 import com.fundaciontextil.ui.auth.RegistroEmprendedoraScreen
 import com.fundaciontextil.ui.perfil.PerfilScreen
+import com.fundaciontextil.ui.producto.CatalogoEmprendedoraScreen
+import com.fundaciontextil.ui.producto.NuevoProductoScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -48,6 +50,7 @@ private fun pestanaActiva(ruta: String?): String? = when {
     ruta == null -> null
     ruta.startsWith("emprendedora") || ruta.startsWith("producto") -> Rutas.EXPLORAR
     ruta.startsWith("chat") -> Rutas.MENSAJES
+    ruta.startsWith("nuevo_producto") -> Rutas.PERFIL   // NUEVO
     else -> ruta
 }
 
@@ -177,12 +180,10 @@ fun AppNav() {
                 arguments = listOf(navArgument("emprendedoraId") { type = NavType.IntType }),
             ) { entrada ->
                 val id = entrada.arguments?.getInt("emprendedoraId") ?: 0
-                PantallaDemo(
-                    "Catálogo de la emprendedora $id",
-                    listOf(
-                        Accion("Ver producto 10") { navController.navigate(Rutas.producto(10)) },
-                        Accion("Volver") { navController.popBackStack() },
-                    ),
+                // NUEVO: catálogo real con fotos; lo ve cualquiera, también el invitado
+                CatalogoEmprendedoraScreen(
+                    emprendedoraId = id.toLong(),
+                    alVolver = { navController.popBackStack() },
                 )
             }
             composable(
@@ -229,6 +230,7 @@ fun AppNav() {
             composable(Rutas.PERFIL) {
                 if (haySesion) {
                     PerfilScreen(
+                        alAgregarProducto = { navController.navigate(Rutas.NUEVO_PRODUCTO) },   // NUEVO
                         alCerrarSesion = {
                             // Se borra la sesión guardada; si no, el splash volvería a entrar solo.
                             ServiceLocator.sesionRepository.cerrarSesion()
@@ -242,6 +244,13 @@ fun AppNav() {
                         irARegistro = { navController.navigate(Rutas.REGISTRO) },
                     )
                 }
+            }
+            // NUEVO: formulario para publicar un producto (cámara + galería)
+            composable(Rutas.NUEVO_PRODUCTO) {
+                NuevoProductoScreen(
+                    alPublicado = { navController.popBackStack() },
+                    alVolver = { navController.popBackStack() },
+                )
             }
         }
     }

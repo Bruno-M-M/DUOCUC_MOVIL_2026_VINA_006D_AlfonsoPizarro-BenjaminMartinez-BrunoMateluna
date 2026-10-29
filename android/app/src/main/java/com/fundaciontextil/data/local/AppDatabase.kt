@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase
         SolicitudEmprendedoraEntity::class,
         FotoPerfilEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -24,6 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun solicitudEmprendedoraDao(): SolicitudEmprendedoraDao
 
     abstract fun fotoDao(): FotoDao
+    abstract  fun publicacionDao(): PublicacionDao
 
     companion object {
         fun crear(context: Context): AppDatabase =

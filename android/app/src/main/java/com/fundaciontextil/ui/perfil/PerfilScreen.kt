@@ -14,13 +14,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PerfilScreen(alCerrarSesion: () -> Unit) {
+fun PerfilScreen(
+    alAgregarProducto: () -> Unit,
+    alCerrarSesion: () -> Unit
+) {
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Mi perfil", style = MaterialTheme.typography.headlineSmall)
-        FotoPerfilSeccion() // solo se ve si el rol es emprendedora o administradora
-        Button(onClick = alCerrarSesion) { Text("Cerrar sesión") }
+        Text(
+            "Mi perfil",
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        FotoPerfilSeccion()
+
+        Button(onClick = alAgregarProducto) {
+            Text("Agregar producto")
+        }
+
+        Button(onClick = alCerrarSesion) {
+            Text("Cerrar sesión")
+        }
     }
 }
