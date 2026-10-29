@@ -39,5 +39,7 @@ class SesionRepository(
         return resultado
     }
 
+    suspend fun actualizarPerfil(usuario: Usuario) = usuarios.actualizarPerfil(usuario)
+
     fun cerrarSesion() = almacen.limpiar()
 }

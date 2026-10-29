@@ -26,6 +26,11 @@ internal class DaoFalso : UsuarioDao {
     override suspend fun buscarPorRutHash(rutHash: String) = filas.firstOrNull { it.rutHash == rutHash }
 
     override suspend fun buscarPorId(id: Long) = filas.firstOrNull { it.id == id }
+
+    override suspend fun actualizarPerfil(id: Long, nombre: String, telefono: String?, region: String?, comuna: String?) {
+        val i = filas.indexOfFirst { it.id == id }
+        if (i >= 0) filas[i] = filas[i].copy(nombre = nombre, telefono = telefono, region = region, comuna = comuna)
+    }
 }
 
 internal class AlmacenSesionEnMemoria : AlmacenSesion {

@@ -98,6 +98,20 @@ class UsuarioRepositoryLocalTest {
     }
 
     @Test
+    fun `al actualizar el perfil se guardan los datos sin espacios y un telefono vacio queda nulo`() = runTest {
+        registrarCliente()
+        val ana = repositorio.buscarPorId(1)!!
+
+        repositorio.actualizarPerfil(ana.copy(nombre = " Ana Pérez ", telefono = " ", region = "Biobío", comuna = "Concepción"))
+
+        val guardada = repositorio.buscarPorId(1)!!
+        assertEquals("Ana Pérez", guardada.nombre)
+        assertNull(guardada.telefono)
+        assertEquals("Concepción", guardada.comuna)
+        assertEquals("ana@demo.cl", guardada.correo)
+    }
+
+    @Test
     fun `buscar por id devuelve el usuario o null`() = runTest {
         registrarCliente()
 

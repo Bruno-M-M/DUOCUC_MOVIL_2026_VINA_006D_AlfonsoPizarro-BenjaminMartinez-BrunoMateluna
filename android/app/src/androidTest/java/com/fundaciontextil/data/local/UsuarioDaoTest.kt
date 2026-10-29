@@ -64,6 +64,19 @@ class UsuarioDaoTest {
     }
 
     @Test
+    fun actualizar_el_perfil_cambia_solo_los_datos_editables() = runBlocking {
+        val id = dao.insertar(usuario())
+
+        dao.actualizarPerfil(id, "Ana Pérez", "+56912345678", "Biobío", "Concepción")
+
+        val actualizado = dao.buscarPorId(id)!!
+        assertEquals("Ana Pérez", actualizado.nombre)
+        assertEquals("+56912345678", actualizado.telefono)
+        assertEquals("Concepción", actualizado.comuna)
+        assertEquals("ana@demo.cl", actualizado.correo)
+    }
+
+    @Test
     fun no_permite_dos_usuarios_con_el_mismo_correo() {
         runBlocking { dao.insertar(usuario()) }
 

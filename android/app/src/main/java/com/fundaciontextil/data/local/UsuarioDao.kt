@@ -18,4 +18,7 @@ interface UsuarioDao {
 
     @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
     suspend fun buscarPorId(id: Long): UsuarioEntity?
+
+    @Query("UPDATE usuarios SET nombre = :nombre, telefono = :telefono, region = :region, comuna = :comuna WHERE id = :id")
+    suspend fun actualizarPerfil(id: Long, nombre: String, telefono: String?, region: String?, comuna: String?)
 }

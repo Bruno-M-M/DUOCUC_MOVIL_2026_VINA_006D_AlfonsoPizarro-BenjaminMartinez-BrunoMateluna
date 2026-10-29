@@ -51,6 +51,14 @@ class RegistroEmprendedoraRepositoryTest {
     }
 
     @Test
+    fun `la ubicacion del emprendimiento tambien queda en el perfil`() = runTest {
+        registrarMarta()
+
+        assertEquals("Valparaíso", dao.filas.single().region)
+        assertEquals("Viña del Mar", dao.filas.single().comuna)
+    }
+
+    @Test
     fun `con una sola categoria la segunda queda vacia`() = runTest {
         registrarMarta(telarVerde.copy(categorias = setOf("Supra reciclaje")))
 

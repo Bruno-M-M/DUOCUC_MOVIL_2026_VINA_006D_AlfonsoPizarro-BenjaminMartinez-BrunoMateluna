@@ -17,4 +17,6 @@ interface UsuarioRepository {
     suspend fun iniciarSesion(correo: String, clave: String): ResultadoInicioSesion
 
     suspend fun buscarPorId(id: Long): Usuario?
+
+    suspend fun actualizarPerfil(usuario: Usuario)
 }
