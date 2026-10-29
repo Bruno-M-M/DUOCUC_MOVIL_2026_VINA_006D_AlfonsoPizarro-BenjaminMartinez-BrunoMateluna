@@ -11,8 +11,6 @@ import com.fundaciontextil.data.local.UsuarioDao
 import com.fundaciontextil.data.repository.CatalogoRepository
 import com.fundaciontextil.data.repository.CatalogoRepositoryLocal
 import com.fundaciontextil.data.repository.FotoPerfilRepository
-import com.fundaciontextil.data.repository.PulsacionesRepository
-import com.fundaciontextil.data.repository.PulsacionesRepositoryEnMemoria
 import com.fundaciontextil.data.repository.RegistroEmprendedoraRepository
 import com.fundaciontextil.data.repository.SesionRepository
 import com.fundaciontextil.data.repository.UsuarioRepository
@@ -38,10 +36,6 @@ object ServiceLocator {
     val solicitudEmprendedoraDao: SolicitudEmprendedoraDao by lazy { baseDeDatos.solicitudEmprendedoraDao() }
 
     val fotoDao: FotoDao by lazy { baseDeDatos.fotoDao() }
-
-    val pulsacionesRepository: PulsacionesRepository by lazy {
-        PulsacionesRepositoryEnMemoria()
-    }
 
     val usuarioRepository: UsuarioRepository by lazy { UsuarioRepositoryLocal(usuarioDao) }
 
