@@ -7,6 +7,7 @@ import com.fundaciontextil.ui.components.PantallaDemo
 import com.fundaciontextil.ui.auth.LoginScreen
 import com.fundaciontextil.ui.auth.RegistroScreen
 import com.fundaciontextil.ui.auth.RegistroEmprendedoraScreen
+import com.fundaciontextil.ui.perfil.PerfilScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -227,15 +228,12 @@ fun AppNav() {
 
             composable(Rutas.PERFIL) {
                 if (haySesion) {
-                    PantallaDemo(
-                        "Mi perfil",
-                        listOf(
-                            Accion("Cerrar sesión") {
-                                // Se borra la sesión guardada; si no, el splash volvería a entrar solo.
-                                ServiceLocator.sesionRepository.cerrarSesion()
-                                haySesion = false
-                            },
-                        ),
+                    PerfilScreen(
+                        alCerrarSesion = {
+                            // Se borra la sesión guardada; si no, el splash volvería a entrar solo.
+                            ServiceLocator.sesionRepository.cerrarSesion()
+                            haySesion = false
+                        },
                     )
                 } else {
                     PedirSesion(
