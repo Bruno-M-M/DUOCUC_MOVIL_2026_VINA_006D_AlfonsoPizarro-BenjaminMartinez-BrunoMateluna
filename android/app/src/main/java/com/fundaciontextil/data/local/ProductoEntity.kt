@@ -21,4 +21,5 @@ data class ProductoEntity(
     val nombre: String,
     val descripcion: String,
     val precio: Int,
+    val fotoArchivo: String?= null,
 )

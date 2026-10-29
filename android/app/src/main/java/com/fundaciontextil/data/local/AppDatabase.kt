@@ -11,8 +11,9 @@ import androidx.room.RoomDatabase
         EmprendedoraEntity::class,
         ProductoEntity::class,
         SolicitudEmprendedoraEntity::class,
+        FotoPerfilEntity::class,
     ],
-    version = 4,
+    version = 6,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -21,6 +22,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun catalogoDao(): CatalogoDao
 
     abstract fun solicitudEmprendedoraDao(): SolicitudEmprendedoraDao
+
+    abstract fun fotoDao(): FotoDao
+    abstract  fun publicacionDao(): PublicacionDao
 
     companion object {
         fun crear(context: Context): AppDatabase =

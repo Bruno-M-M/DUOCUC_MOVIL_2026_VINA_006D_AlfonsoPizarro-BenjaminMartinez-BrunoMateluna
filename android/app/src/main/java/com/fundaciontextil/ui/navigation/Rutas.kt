@@ -15,6 +15,8 @@ object Rutas {
     const val MENSAJES = "mensajes"
     const val NOVEDADES = "novedades"
     const val PERFIL = "perfil"
+    const val NUEVO_PRODUCTO = "nuevo_producto"
+
 
     // Pantallas de detalle: llevan un número (id) en la ruta
     const val EMPRENDEDORA = "emprendedora/{emprendedoraId}"

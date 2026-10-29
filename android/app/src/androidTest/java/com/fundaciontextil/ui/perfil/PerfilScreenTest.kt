@@ -81,6 +81,24 @@ class PerfilScreenTest {
     }
 
     @Test
+    fun la_emprendedora_ve_agregar_producto_y_avisa() {
+        var agregar = 0
+        val emprendedora = precargado.copy(guardado = camila.copy(rol = Rol.EMPRENDEDORA))
+        mostrar(emprendedora, AccionesPerfil(alAgregarProducto = { agregar++ }))
+
+        boton("Agregar producto").performScrollTo().performClick()
+
+        assertEquals(1, agregar)
+    }
+
+    @Test
+    fun el_cliente_no_ve_agregar_producto() {
+        mostrar(precargado)
+
+        boton("Agregar producto").assertDoesNotExist()
+    }
+
+    @Test
     fun cerrar_sesion_avisa() {
         var cierres = 0
         mostrar(precargado, AccionesPerfil(alCerrarSesion = { cierres++ }))

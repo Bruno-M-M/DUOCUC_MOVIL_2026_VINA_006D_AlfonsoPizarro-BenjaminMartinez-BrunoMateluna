@@ -41,6 +41,7 @@ import com.fundaciontextil.data.model.EstadoCuenta
 import com.fundaciontextil.data.model.RegionesDeChile
 import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.model.Usuario
+import com.fundaciontextil.data.model.puedePublicarProductos
 import com.fundaciontextil.ui.components.Campo
 import com.fundaciontextil.ui.components.SelectorDeLista
 import com.fundaciontextil.ui.components.TipoCampo
@@ -52,11 +53,13 @@ data class AccionesPerfil(
     val alElegirRegion: (String) -> Unit = {},
     val alElegirComuna: (String) -> Unit = {},
     val alGuardar: () -> Unit = {},
+    val alAgregarProducto: () -> Unit = {},
     val alCerrarSesion: () -> Unit = {},
 )
 
 @Composable
 fun PerfilScreen(
+    alAgregarProducto: () -> Unit,
     alCerrarSesion: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PerfilViewModel = viewModel(factory = PerfilViewModel.Factory),
@@ -64,12 +67,15 @@ fun PerfilScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     PerfilContenido(
         uiState = uiState,
+        // La foto tiene su propio ViewModel; solo se muestra a emprendedoras y administración.
+        seccionFoto = { FotoPerfilSeccion(Modifier.padding(top = 24.dp)) },
         acciones = AccionesPerfil(
             alCambiarNombre = viewModel::alCambiarNombre,
             alCambiarTelefono = viewModel::alCambiarTelefono,
             alElegirRegion = viewModel::alElegirRegion,
             alElegirComuna = viewModel::alElegirComuna,
             alGuardar = viewModel::alGuardar,
+            alAgregarProducto = alAgregarProducto,
             alCerrarSesion = alCerrarSesion,
         ),
         modifier = modifier,
@@ -81,6 +87,7 @@ internal fun PerfilContenido(
     uiState: PerfilUiState,
     acciones: AccionesPerfil,
     modifier: Modifier = Modifier,
+    seccionFoto: @Composable () -> Unit = {},
 ) {
     if (uiState.cargando) {
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -106,7 +113,15 @@ internal fun PerfilContenido(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            seccionFoto()
             Formulario(uiState, acciones)
+
+            if (usuario.rol.puedePublicarProductos()) {
+                Spacer(Modifier.height(24.dp))
+                Button(onClick = acciones.alAgregarProducto, modifier = Modifier.fillMaxWidth()) {
+                    Text("Agregar producto")
+                }
+            }
         }
 
         Spacer(Modifier.height(24.dp))
