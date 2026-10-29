@@ -32,68 +32,37 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fundaciontextil.ui.permisos.PermisosApp
-import com.fundaciontextil.ui.permisos.rememberPermisoAccion
+import com.fundaciontextil.ui.permisos.rememberPermisoCamara
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-
 @Composable
 fun FotoPerfilSeccion(
     modifier: Modifier = Modifier,
-    viewModel: FotoViewModel = viewModel(
-        factory = FotoViewModel.Factory
-    ),
+    viewModel: FotoViewModel = viewModel(factory = FotoViewModel.Factory),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.cargar()
+    LaunchedEffect(Unit) { viewModel.cargar() }
+
+    var rutaCamara by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val lanzarCamara = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { tomada ->
+        rutaCamara?.let { viewModel.alResultadoCamara(File(it), tomada) }
+        rutaCamara = null
+    }
+    val lanzarGaleria = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.alElegirDeGaleria(uri)
     }
 
-    var rutaCamara by rememberSaveable {
-        mutableStateOf<String?>(null)
-    }
-
-    val lanzarCamara =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.TakePicture()
-        ) { tomada ->
-            rutaCamara?.let {
-                viewModel.alResultadoCamara(
-                    File(it),
-                    tomada
-                )
-            }
-            rutaCamara = null
-        }
-
-    val lanzarGaleria =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.GetContent()
-        ) { uri ->
-            viewModel.alElegirDeGaleria(uri)
-        }
-
-    val pedirPermisoCamara = rememberPermisoAccion(
-        permisos = PermisosApp.CAMARA,
-        explicacion =
-            "Necesitamos permiso para tomar tu foto de perfil.",
-        textoBloqueado =
-            "El permiso de cámara está bloqueado. " +
-                    "Puedes habilitarlo en Ajustes o elegir una foto de galería.",
-        alDenegar = {}
-    ) {
-        val destino = viewModel.crearDestinoCamara()
-            ?: return@rememberPermisoAccion
-
+    val pedirCamara = rememberPermisoCamara {
+        val destino = viewModel.crearDestinoCamara() ?: return@rememberPermisoCamara
         rutaCamara = destino.archivo.absolutePath
-
         try {
             lanzarCamara.launch(destino.uri)
-        } catch (e: ActivityNotFoundException) {
+        } catch (e: ActivityNotFoundException) { // emulador sin app de cámara
             rutaCamara = null
             viewModel.alFallarCamara(destino.archivo)
         }
@@ -108,94 +77,53 @@ fun FotoPerfilSeccion(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(
-            "Foto",
-            style = MaterialTheme.typography.titleMedium
-        )
+        Text("Foto", style = MaterialTheme.typography.titleMedium)
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
+            modifier = Modifier.fillMaxWidth().height(220.dp),
             contentAlignment = Alignment.Center,
         ) {
             val imagen = rememberImagen(mostrada)
-
             when {
-                ocupado -> CircularProgressIndicator(
-                    Modifier.size(32.dp)
-                )
-
+                ocupado -> CircularProgressIndicator(Modifier.size(32.dp))
                 imagen != null -> Image(
                     bitmap = imagen,
                     contentDescription = "Foto seleccionada",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp),
+                    modifier = Modifier.fillMaxWidth().height(220.dp),
                     contentScale = ContentScale.Fit,
                 )
-
-                else -> Text(
-                    "Aún no hay foto",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                else -> Text("Aún no hay foto", style = MaterialTheme.typography.bodyMedium)
             }
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
                 enabled = !ocupado,
-                onClick = pedirPermisoCamara,
-            ) {
-                Text("Tomar foto")
-            }
+                onClick = pedirCamara,
+            ) { Text("Tomar foto") }
 
             OutlinedButton(
                 enabled = !ocupado,
-                onClick = {
-                    lanzarGaleria.launch("image/*")
-                },
-            ) {
-                Text("Elegir de galería")
-            }
+                onClick = { lanzarGaleria.launch("image/*") },
+            ) { Text("Elegir de galería") }
         }
 
         if (estado.fotoPendiente != null) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    enabled = !ocupado,
-                    onClick = viewModel::guardar
-                ) {
-                    Text("Guardar")
-                }
-
-                OutlinedButton(
-                    enabled = !ocupado,
-                    onClick = viewModel::descartarPendiente
-                ) {
-                    Text("Descartar")
-                }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(enabled = !ocupado, onClick = viewModel::guardar) { Text("Guardar") }
+                OutlinedButton(enabled = !ocupado, onClick = viewModel::descartarPendiente) { Text("Descartar") }
             }
         }
 
-        estado.mensaje?.let { mensaje ->
-            Text(
-                mensaje,
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            LaunchedEffect(mensaje) {
+        estado.mensaje?.let {
+            Text(it, style = MaterialTheme.typography.bodyMedium)
+            LaunchedEffect(it) {
                 delay(3_000)
                 viewModel.mensajeMostrado()
             }
         }
     }
 }
-
 
 @Composable
 private fun rememberImagen(archivo: File?): ImageBitmap? =

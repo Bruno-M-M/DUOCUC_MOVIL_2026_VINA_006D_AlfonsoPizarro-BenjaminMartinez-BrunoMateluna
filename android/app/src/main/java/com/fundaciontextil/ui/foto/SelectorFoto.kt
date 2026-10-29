@@ -35,8 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fundaciontextil.data.ServiceLocator
-import com.fundaciontextil.ui.permisos.PermisosApp
-import com.fundaciontextil.ui.permisos.rememberPermisoAccion
+import com.fundaciontextil.ui.permisos.rememberPermisoCamara
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -56,12 +55,7 @@ fun SelectorFoto(control: ControlFoto, modifier: Modifier = Modifier) {
         control.alElegirDeGaleria(uri)
     }
 
-    val pedirCamara = rememberPermisoAccion(
-        permisos = PermisosApp.CAMARA,
-        explicacion = "Usamos la cámara para sacar la foto de tu producto.",
-        textoBloqueado = "El permiso de cámara está bloqueado. Actívalo en Ajustes o elige una foto de la galería.",
-        alDenegar = { /* plan B: la galería sigue disponible */ },
-    ) {
+    val pedirCamara = rememberPermisoCamara {
         val destino = control.crearDestinoCamara()
         rutaCamara = destino.archivo.absolutePath
         try {
@@ -90,7 +84,10 @@ fun SelectorFoto(control: ControlFoto, modifier: Modifier = Modifier) {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(enabled = !ocupado, onClick = pedirCamara) { Text("Tomar foto") }
+            OutlinedButton(
+                enabled = !ocupado,
+                onClick = pedirCamara,
+            ) { Text("Tomar foto") }
 
             OutlinedButton(
                 enabled = !ocupado,
