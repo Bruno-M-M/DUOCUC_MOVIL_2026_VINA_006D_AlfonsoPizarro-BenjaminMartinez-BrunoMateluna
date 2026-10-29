@@ -22,4 +22,7 @@ data class UsuarioEntity(
     val sal: String,
     val rol: Rol,
     val estado: EstadoCuenta,
+    val telefono: String? = null,
+    val region: String? = null,
+    val comuna: String? = null,
 )

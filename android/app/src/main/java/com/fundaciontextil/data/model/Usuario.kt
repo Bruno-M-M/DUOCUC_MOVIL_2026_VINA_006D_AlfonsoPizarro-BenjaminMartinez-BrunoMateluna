@@ -6,4 +6,7 @@ data class Usuario(
     val correo: String,
     val rol: Rol,
     val estado: EstadoCuenta,
+    val telefono: String? = null,
+    val region: String? = null,
+    val comuna: String? = null,
 )

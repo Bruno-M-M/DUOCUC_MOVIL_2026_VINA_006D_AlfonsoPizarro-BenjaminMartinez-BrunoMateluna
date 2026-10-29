@@ -72,6 +72,15 @@ class UsuarioRepositoryLocal(
 
     override suspend fun buscarPorId(id: Long): Usuario? = dao.buscarPorId(id)?.aUsuario()
 
+    override suspend fun actualizarPerfil(usuario: Usuario) {
+        dao.actualizarPerfil(
+            id = usuario.id,
+            nombre = usuario.nombre.trim(),
+            telefono = usuario.telefono?.trim()?.ifEmpty { null },
+            region = usuario.region,
+            comuna = usuario.comuna,
+        )
+    }
     private fun normalizarCorreo(correo: String): String = correo.trim().lowercase()
 
     private fun estadoInicial(rol: Rol): EstadoCuenta =
@@ -83,5 +92,8 @@ class UsuarioRepositoryLocal(
         correo = correo,
         rol = rol,
         estado = estado,
+        telefono = telefono,
+        region = region,
+        comuna = comuna,
     )
 }

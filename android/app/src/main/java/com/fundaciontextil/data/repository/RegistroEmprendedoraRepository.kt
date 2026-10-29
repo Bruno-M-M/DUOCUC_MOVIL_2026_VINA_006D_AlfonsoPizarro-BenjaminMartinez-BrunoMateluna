@@ -28,7 +28,11 @@ class RegistroEmprendedoraRepository(
                     comuna = emprendimiento.comuna,
                     categoria1 = categorias.first(),
                     categoria2 = categorias.getOrNull(1),
+
                 ),
+            )
+            sesion.actualizarPerfil(
+                resultado.usuario.copy(region = emprendimiento.region, comuna = emprendimiento.comuna),
             )
         }
         return resultado
