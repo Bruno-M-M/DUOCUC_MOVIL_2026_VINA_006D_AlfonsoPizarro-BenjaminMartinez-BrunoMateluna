@@ -35,6 +35,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fundaciontextil.data.ServiceLocator
+import com.fundaciontextil.ui.permisos.PermisosApp
+import com.fundaciontextil.ui.permisos.rememberPermisoAccion
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -44,7 +46,6 @@ import kotlinx.coroutines.withContext
 fun SelectorFoto(control: ControlFoto, modifier: Modifier = Modifier) {
     val estado by control.estado.collectAsStateWithLifecycle()
 
-    // Sobrevive a que Android mate la app mientras se toma la foto.
     var rutaCamara by rememberSaveable { mutableStateOf<String?>(null) }
 
     val lanzarCamara = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { tomada ->
@@ -53,6 +54,22 @@ fun SelectorFoto(control: ControlFoto, modifier: Modifier = Modifier) {
     }
     val lanzarGaleria = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         control.alElegirDeGaleria(uri)
+    }
+
+    val pedirCamara = rememberPermisoAccion(
+        permisos = PermisosApp.CAMARA,
+        explicacion = "Usamos la cámara para sacar la foto de tu producto.",
+        textoBloqueado = "El permiso de cámara está bloqueado. Actívalo en Ajustes o elige una foto de la galería.",
+        alDenegar = { /* plan B: la galería sigue disponible */ },
+    ) {
+        val destino = control.crearDestinoCamara()
+        rutaCamara = destino.archivo.absolutePath
+        try {
+            lanzarCamara.launch(destino.uri)
+        } catch (e: ActivityNotFoundException) { // emulador sin app de cámara
+            rutaCamara = null
+            control.alFallarCamara(destino.archivo)
+        }
     }
 
     val ocupado = estado.procesando
@@ -73,19 +90,7 @@ fun SelectorFoto(control: ControlFoto, modifier: Modifier = Modifier) {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(
-                enabled = !ocupado,
-                onClick = {
-                    val destino = control.crearDestinoCamara()
-                    rutaCamara = destino.archivo.absolutePath
-                    try {
-                        lanzarCamara.launch(destino.uri)
-                    } catch (e: ActivityNotFoundException) { // emulador sin app de cámara
-                        rutaCamara = null
-                        control.alFallarCamara(destino.archivo)
-                    }
-                },
-            ) { Text("Tomar foto") }
+            OutlinedButton(enabled = !ocupado, onClick = pedirCamara) { Text("Tomar foto") }
 
             OutlinedButton(
                 enabled = !ocupado,

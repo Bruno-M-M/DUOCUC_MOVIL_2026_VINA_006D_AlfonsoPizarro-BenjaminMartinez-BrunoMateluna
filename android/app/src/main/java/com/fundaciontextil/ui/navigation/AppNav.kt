@@ -8,6 +8,7 @@ import com.fundaciontextil.ui.auth.LoginScreen
 import com.fundaciontextil.ui.auth.RegistroScreen
 import com.fundaciontextil.ui.auth.RegistroEmprendedoraScreen
 import com.fundaciontextil.ui.auth.RecuperarClaveScreen
+import com.fundaciontextil.ui.explorar.ExplorarScreen
 import com.fundaciontextil.ui.perfil.PerfilScreen
 import com.fundaciontextil.ui.producto.CatalogoEmprendedoraScreen
 import com.fundaciontextil.ui.producto.NuevoProductoScreen
@@ -51,7 +52,7 @@ private fun pestanaActiva(ruta: String?): String? = when {
     ruta == null -> null
     ruta.startsWith("emprendedora") || ruta.startsWith("producto") -> Rutas.EXPLORAR
     ruta.startsWith("chat") -> Rutas.MENSAJES
-    ruta.startsWith("nuevo_producto") -> Rutas.PERFIL   // NUEVO
+    ruta.startsWith("nuevo_producto") -> Rutas.PERFIL
     else -> ruta
 }
 
@@ -164,21 +165,19 @@ fun AppNav() {
                     },
                 )
             }
+
+            // CAMBIO: lista real con el nombre de cada emprendedora
             composable(Rutas.EXPLORAR) {
-                PantallaDemo(
-                    "Explorar: lista de emprendedoras",
-                    listOf(
-                        Accion("Ver emprendedora 1") { navController.navigate(Rutas.emprendedora(1)) },
-                        Accion("Ver emprendedora 2") { navController.navigate(Rutas.emprendedora(2)) },
-                    ),
+                ExplorarScreen(
+                    alAbrirEmprendedora = { id -> navController.navigate(Rutas.emprendedora(id.toInt())) },
                 )
             }
+
             composable(
                 Rutas.EMPRENDEDORA,
                 arguments = listOf(navArgument("emprendedoraId") { type = NavType.IntType }),
             ) { entrada ->
                 val id = entrada.arguments?.getInt("emprendedoraId") ?: 0
-                // NUEVO: catálogo real con fotos; lo ve cualquiera, también el invitado
                 CatalogoEmprendedoraScreen(
                     emprendedoraId = id.toLong(),
                     alVolver = { navController.popBackStack() },
@@ -230,7 +229,6 @@ fun AppNav() {
                     PerfilScreen(
                         alAgregarProducto = { navController.navigate(Rutas.NUEVO_PRODUCTO) },
                         alCerrarSesion = {
-                            // Se borra la sesión guardada; si no, el splash volvería a entrar solo.
                             ServiceLocator.sesionRepository.cerrarSesion()
                             haySesion = false
                         },
@@ -243,7 +241,6 @@ fun AppNav() {
                     )
                 }
             }
-            // NUEVO: formulario para publicar un producto (cámara + galería)
             composable(Rutas.NUEVO_PRODUCTO) {
                 NuevoProductoScreen(
                     alPublicado = { navController.popBackStack() },
