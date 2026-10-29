@@ -228,6 +228,7 @@ fun AppNav() {
                 if (haySesion) {
                     PerfilScreen(
                         alCerrarSesion = {
+                            // Se borra la sesión guardada; si no, el splash volvería a entrar solo.
                             ServiceLocator.sesionRepository.cerrarSesion()
                             haySesion = false
                         },

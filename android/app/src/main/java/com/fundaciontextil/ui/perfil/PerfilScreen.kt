@@ -64,6 +64,8 @@ fun PerfilScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     PerfilContenido(
         uiState = uiState,
+        // La foto tiene su propio ViewModel; solo se muestra a emprendedoras y administración.
+        seccionFoto = { FotoPerfilSeccion(Modifier.padding(top = 24.dp)) },
         acciones = AccionesPerfil(
             alCambiarNombre = viewModel::alCambiarNombre,
             alCambiarTelefono = viewModel::alCambiarTelefono,
@@ -81,6 +83,7 @@ internal fun PerfilContenido(
     uiState: PerfilUiState,
     acciones: AccionesPerfil,
     modifier: Modifier = Modifier,
+    seccionFoto: @Composable () -> Unit = {},
 ) {
     if (uiState.cargando) {
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -106,6 +109,7 @@ internal fun PerfilContenido(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            seccionFoto()
             Formulario(uiState, acciones)
         }
 
