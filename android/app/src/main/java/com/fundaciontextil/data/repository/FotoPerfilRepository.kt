@@ -40,6 +40,4 @@ class FotoPerfilRepository(
         if (anterior != null && anterior != nueva) almacen.borrar(anterior)
         return ResultadoFoto.Guardada
     }
-
-    suspend fun limpiarHuerfanos() = almacen.limpiarHuerfanos(dao.todosLosArchivos().toSet())
 }
