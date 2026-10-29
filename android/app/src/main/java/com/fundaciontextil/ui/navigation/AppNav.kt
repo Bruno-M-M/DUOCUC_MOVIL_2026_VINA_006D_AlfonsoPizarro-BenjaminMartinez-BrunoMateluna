@@ -7,6 +7,7 @@ import com.fundaciontextil.ui.components.PantallaDemo
 import com.fundaciontextil.ui.auth.LoginScreen
 import com.fundaciontextil.ui.auth.RegistroScreen
 import com.fundaciontextil.ui.auth.RegistroEmprendedoraScreen
+import com.fundaciontextil.ui.auth.RecuperarClaveScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -135,10 +136,7 @@ fun AppNav() {
                 )
             }
             composable(Rutas.RECUPERAR_CLAVE) {
-                PantallaDemo(
-                    "Recuperar contraseña",
-                    listOf(Accion("Volver") { navController.popBackStack() }),
-                )
+                RecuperarClaveScreen(alVolver = { navController.popBackStack() })
             }
             composable(Rutas.REGISTRO) {
                 RegistroScreen(
