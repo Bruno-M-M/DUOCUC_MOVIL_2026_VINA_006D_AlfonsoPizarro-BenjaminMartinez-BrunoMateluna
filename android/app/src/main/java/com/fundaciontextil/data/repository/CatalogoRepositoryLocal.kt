@@ -32,5 +32,6 @@ class CatalogoRepositoryLocal(private val dao: CatalogoDao) : CatalogoRepository
         nombre = nombre,
         descripcion = descripcion,
         precio = precio,
+        fotoArchivo = fotoArchivo,
     )
 }

@@ -9,9 +9,10 @@ data class Emprendedora (
 
 
 data class Producto(
-        val id: Long,
-        val emprendedoraId: Long,
-        val nombre: String,
-        val descripcion: String,
-        val precio: Int,
-        )
+    val id: Long,
+    val emprendedoraId: Long,
+    val nombre: String,
+    val descripcion: String,
+    val precio: Int,
+    val fotoArchivo: String? = null,
+)

@@ -9,4 +9,5 @@ data class EmprendedoraEntity(
     val nombre: String,
     val emprendimiento: String,
     val comuna: String,
+    val usuarioId: Long?= null,
 )
