@@ -16,6 +16,10 @@ Está creada la **base de la app**: un proyecto de Android Studio (plantilla *Em
 
 La planificación del equipo (historias, responsables y avance) se lleva en [**Trello**](https://trello.com/b/kFvJRnCK/federaciontextil).
 
+## Limitaciones de esta entrega
+
+- **Recuperar contraseña** valida el correo y muestra siempre el mismo mensaje («si el correo está registrado, te enviaremos las instrucciones»), exista o no la cuenta, para no revelar qué correos están registrados. El envío real del correo depende del servidor, que se incorpora en la siguiente etapa; por ahora el envío es simulado.
+
 ## Tecnologías
 
 - Kotlin, Android Studio, Jetpack Compose y Material Design 3
