@@ -112,7 +112,15 @@ Las pruebas de pantalla y de la base de datos necesitan un emulador o un celular
 ./gradlew connectedDebugAndroidTest
 ```
 
-En Windows se usa `gradlew.bat` en vez de `./gradlew`, siempre desde la carpeta `android`. Los ViewModels se prueban con repositorios y DAO falsos escritos a mano (`app/src/test/.../data/repository/Falsos.kt`), sin librerías de *mocks*.
+En Windows se usa `gradlew.bat` en vez de `./gradlew`, siempre desde la carpeta `android`. Los ViewModels y repositorios se prueban con repositorios y DAO falsos escritos a mano (`app/src/test/.../data/repository/Falsos.kt`), y las pruebas nuevas usan MockK y Turbine (ver abajo).
+
+### Pruebas con MockK y Turbine
+
+- **MockK** simula dependencias, como `ApiService`. Con `coEvery` se define lo que devuelve una función `suspend` y con `coVerify` se comprueba que se llamó.
+- **Turbine** prueba los `Flow` y `StateFlow`. Con `flow.test { awaitItem() }` se revisa cada valor que emite el flujo, en orden.
+- **`MainDispatcherRule`** (`app/src/test/.../MainDispatcherRule.kt`) reemplaza el dispatcher principal por uno de prueba. Ponla como `@get:Rule` en cualquier prueba de ViewModel que use corrutinas.
+
+Como modelo para copiar el patrón, mira `app/src/test/.../data/remote/PatronesDePruebaTest.kt`: una prueba con MockK y otra con Turbine.
 
 ## Cómo trabajamos
 
