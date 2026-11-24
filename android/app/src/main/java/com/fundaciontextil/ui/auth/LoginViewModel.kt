@@ -22,11 +22,11 @@ class LoginViewModel(
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     fun alCambiarCorreo(correo: String) {
-        _uiState.update { it.copy(correo = correo, correoTocado = true, errorCredenciales = null) }
+        _uiState.update { it.copy(correo = correo, correoTocado = true, errorCredenciales = null, errorGeneral = null) }
     }
 
     fun alCambiarClave(clave: String) {
-        _uiState.update { it.copy(clave = clave, claveTocada = true, errorCredenciales = null) }
+        _uiState.update { it.copy(clave = clave, claveTocada = true, errorCredenciales = null, errorGeneral = null) }
     }
 
     fun alIngresar(alExito: () -> Unit) {
@@ -36,9 +36,9 @@ class LoginViewModel(
             return
         }
 
-        _uiState.update { it.copy(cargando = true, errorCredenciales = null) }
+        _uiState.update { it.copy(cargando = true, errorCredenciales = null, errorGeneral = null) }
         viewModelScope.launch {
-            when (sesion.iniciarSesion(actual.correo, actual.clave)) {
+            when (val resultado = sesion.iniciarSesion(actual.correo, actual.clave)) {
                 is ResultadoInicioSesion.Exito -> {
                     _uiState.update { it.copy(cargando = false) }
                     alExito()
@@ -49,6 +49,9 @@ class LoginViewModel(
 
                 ResultadoInicioSesion.CuentaDadaDeBaja ->
                     _uiState.update { it.copy(cargando = false, errorCredenciales = MENSAJE_BAJA) }
+
+                is ResultadoInicioSesion.NoDisponible ->
+                    _uiState.update { it.copy(cargando = false, errorGeneral = resultado.mensaje) }
             }
         }
     }

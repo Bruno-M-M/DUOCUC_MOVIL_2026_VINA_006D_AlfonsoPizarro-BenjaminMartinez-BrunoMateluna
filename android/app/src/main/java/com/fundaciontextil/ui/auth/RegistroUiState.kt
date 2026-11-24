@@ -14,6 +14,7 @@ data class RegistroUiState(
     val correoYaRegistrado: Boolean = false,
     val rutYaRegistrado: Boolean = false,
     val cargando: Boolean = false,
+    val errorGeneral: String? = null,
 ) {
     val errorNombre: String? get() = siTocado(CampoRegistro.NOMBRE) { validarNombre(nombre) }
     val errorCorreo: String?

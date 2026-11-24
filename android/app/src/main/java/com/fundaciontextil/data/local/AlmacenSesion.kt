@@ -24,5 +24,7 @@ class AlmacenSesionPreferencias(context: Context) : AlmacenSesion {
     }
 
     private companion object {
-    const val CLAVE_USUARIO = "usuario_id"}
+        // Clave nueva: los ids guardados por versiones anteriores eran locales, no del servidor.
+        const val CLAVE_USUARIO = "usuario_servidor_id"
+    }
 }

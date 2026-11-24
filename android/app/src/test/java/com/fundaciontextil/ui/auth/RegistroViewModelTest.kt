@@ -4,8 +4,10 @@ import com.fundaciontextil.data.model.EstadoCuenta
 import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.repository.AlmacenSesionEnMemoria
 import com.fundaciontextil.data.repository.DaoFalso
+import com.fundaciontextil.data.repository.MENSAJE_SIN_SERVIDOR
 import com.fundaciontextil.data.repository.SesionRepository
 import com.fundaciontextil.data.repository.UsuarioRepositoryLocal
+import com.fundaciontextil.data.repository.UsuariosSinServidor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -134,5 +136,22 @@ class RegistroViewModelTest {
 
         assertNull(viewModel.uiState.value.errorCorreo)
         assertTrue(viewModel.uiState.value.puedeRegistrar)
+    }
+
+    @Test
+    fun `si el servidor no esta disponible se avisa y se puede reintentar`() {
+        val sinServidor = RegistroViewModel(SesionRepository(UsuariosSinServidor(usuarios), almacen))
+        sinServidor.alCambiarNombre("Ana Pérez")
+        sinServidor.alCambiarCorreo("ana@demo.cl")
+        sinServidor.alCambiarRut("12.345.678-5")
+        sinServidor.alCambiarClave("telar2030")
+        sinServidor.alCambiarRepetirClave("telar2030")
+        sinServidor.alCambiarTerminos(true)
+
+        sinServidor.alRegistrar { throw AssertionError("no debía entrar") }
+
+        assertEquals(MENSAJE_SIN_SERVIDOR, sinServidor.uiState.value.errorGeneral)
+        assertTrue(sinServidor.uiState.value.puedeRegistrar)
+        assertNull(almacen.usuarioId())
     }
 }

@@ -42,7 +42,7 @@ import com.fundaciontextil.ui.theme.FundacionTextilTheme
 fun RecuperarClaveScreen(
     alVolver: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RecuperarClaveViewModel = viewModel(),
+    viewModel: RecuperarClaveViewModel = viewModel(factory = RecuperarClaveViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     RecuperarClaveContenido(
@@ -110,15 +110,24 @@ private fun Formulario(
             tipo = TipoCampo.CORREO,
             error = uiState.errorCorreo,
             esValido = uiState.correoTocado && uiState.errorCorreo == null,
+            habilitado = !uiState.enviando,
             accionIme = ImeAction.Done,
         )
+        uiState.errorEnvio?.let { mensaje ->
+            Text(
+                mensaje,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+            )
+        }
         Spacer(Modifier.height(16.dp))
         Button(
             onClick = alEnviar,
             enabled = uiState.puedeEnviar,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Enviar instrucciones")
+            Text(if (uiState.enviando) "Enviando…" else "Enviar instrucciones")
         }
     }
 }

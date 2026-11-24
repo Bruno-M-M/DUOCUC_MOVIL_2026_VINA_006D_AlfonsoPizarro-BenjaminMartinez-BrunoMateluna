@@ -12,7 +12,7 @@ Esta app permite que las emprendedoras gestionen su perfil y su catálogo con fo
 
 ## Estado actual
 
-La app funciona con **datos locales** (Room), sin servidor todavía. Lo que ya está hecho:
+La sesión (registro, inicio de sesión y perfil) pasa por la API con Retrofit. Mientras no exista el servidor real, la versión de depuración usa `ServidorFalso`, que responde las rutas de `docs/API.md` dentro del teléfono. El catálogo y las fotos siguen en Room. Lo que ya está hecho:
 
 - **Acceso:** pantalla de inicio (*splash*) que recuerda la sesión, inicio de sesión, registro de cliente, registro de emprendedora (con su emprendimiento, región, comuna y hasta dos categorías) y recuperar contraseña. Todos los formularios validan en vivo: correo, RUT con dígito verificador, contraseña segura y aceptación de términos.
 - **Perfil:** cada persona edita su nombre, celular, región y comuna, y agrega una **foto de perfil** con la cámara o desde la galería.
@@ -23,9 +23,10 @@ La planificación del equipo (historias, responsables y avance) se lleva en [**T
 
 ## Limitaciones de esta entrega
 
-- **Recuperar contraseña** valida el correo y muestra siempre el mismo mensaje («si el correo está registrado, te enviaremos las instrucciones»), exista o no la cuenta, para no revelar qué correos están registrados. El envío real del correo depende del servidor, que se incorpora en la siguiente etapa; por ahora el envío es simulado.
+- **Recuperar contraseña** pide el envío a la API y avisa si no hay conexión. Muestra el mismo mensaje exista o no la cuenta, para no revelar qué correos están registrados. `ServidorFalso` no envía ningún correo.
 - **Explorar, Mensajes y Novedades**, y los detalles de emprendedora, producto y conversación, son por ahora pantallas de navegación sin contenido real: se completan en la siguiente etapa.
-- Los datos se guardan solo en el teléfono. La conexión al servidor (Retrofit y API REST) se incorpora en la siguiente etapa.
+- **Sin conexión** se puede entrar y leer el perfil con la última copia guardada en Room. Registrarse y editar el perfil requieren conexión.
+- La versión *release* usa `BASE_URL`, que todavía no apunta a un servidor publicado.
 
 ## Tecnologías
 
@@ -36,8 +37,9 @@ La planificación del equipo (historias, responsables y avance) se lleva en [**T
 - Room para la base de datos local, y `SharedPreferences` para recordar la sesión
 - Contraseñas guardadas con hash PBKDF2 y sal, nunca en texto plano
 - Cámara y galería con `ActivityResultContracts` y un `FileProvider`, sin permisos peligrosos
-- Pruebas con JUnit, `kotlinx-coroutines-test` y Compose UI Test
-- Previstos: Retrofit y un servidor en Spring Boot (API REST)
+- Retrofit para la API REST
+- Pruebas con JUnit, MockK, Turbine, `kotlinx-coroutines-test` y Compose UI Test
+- Previsto: un servidor en Spring Boot
 
 ## Cómo abrir y ejecutar la app
 
@@ -47,7 +49,7 @@ La planificación del equipo (historias, responsables y avance) se lleva en [**T
    ```
 2. En Android Studio, abre la carpeta **`android`** (no la carpeta de más afuera). Es la que contiene `settings.gradle.kts`.
 3. Espera a que termine el *Sync* de Gradle. La primera vez necesita internet.
-4. Ejecuta con *Run*, en un emulador o en un celular.
+4. Ejecuta con *Run*, en un emulador o en un celular. En depuración puedes entrar con `camila@demo.cl` (cliente), `marcela@demo.cl` (emprendedora) o `admin@demo.cl`, con la clave `Textil2026`.
 
 ## Estructura del repositorio
 
@@ -64,6 +66,7 @@ Dentro de `android/app/src/main/java/com/fundaciontextil/`:
 | `data/ServiceLocator.kt` | Arma en un solo lugar la base de datos y los repositorios y se los entrega a los ViewModels, sin librería de inyección |
 | `data/local/` | Base de datos Room: entidades, DAO y datos iniciales del catálogo |
 | `data/model/` | Clases de datos de la app (`Usuario`, `Rol`, regiones y comunas, resultados) |
+| `data/remote/` | Retrofit, contrato de la API y servidor falso |
 | `data/repository/` | Repositorios: la única puerta entre los ViewModels y los datos |
 | `data/seguridad/` | Hash de contraseñas y RUT |
 | `data/foto/` | Guardado y reducción de las fotos tomadas con la cámara o elegidas en la galería |
@@ -81,7 +84,7 @@ Dentro de `android/app/src/main/java/com/fundaciontextil/`:
 La app sigue **MVVM**: cada capa conoce solo a la que tiene debajo.
 
 ```
-Pantalla (Compose) ─→ ViewModel ─→ Repositorio ─→ Room (DAO)
+Pantalla (Compose) ─→ ViewModel ─→ Repositorio ─→ API (Retrofit o ServidorFalso) y Room (DAO)
 ```
 
 | Capa | Responsabilidad | Ejemplo en el código |

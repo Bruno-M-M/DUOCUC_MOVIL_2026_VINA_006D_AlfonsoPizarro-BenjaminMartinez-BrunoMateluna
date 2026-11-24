@@ -3,8 +3,10 @@ package com.fundaciontextil.ui.perfil
 import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.repository.AlmacenSesionEnMemoria
 import com.fundaciontextil.data.repository.DaoFalso
+import com.fundaciontextil.data.repository.MENSAJE_SIN_SERVIDOR
 import com.fundaciontextil.data.repository.SesionRepository
 import com.fundaciontextil.data.repository.UsuarioRepositoryLocal
+import com.fundaciontextil.data.repository.UsuariosSinServidor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -105,5 +107,21 @@ class PerfilViewModelTest {
 
         assertFalse(viewModel.uiState.value.cambiosGuardados)
         assertTrue(viewModel.uiState.value.puedeGuardar)
+    }
+
+    @Test
+    fun `si no se puede guardar se avisa y se conserva lo escrito`() {
+        val almacen = AlmacenSesionEnMemoria().apply { guardar(dao.filas.single().id) }
+        val lectura = UsuarioRepositoryLocal(dao, Dispatchers.Unconfined)
+        val viewModel = PerfilViewModel(SesionRepository(UsuariosSinServidor(lectura), almacen))
+        viewModel.alCambiarNombre("Camila Soto")
+
+        viewModel.alGuardar()
+
+        val estado = viewModel.uiState.value
+        assertEquals(MENSAJE_SIN_SERVIDOR, estado.errorGuardar)
+        assertEquals("Camila Soto", estado.nombre)
+        assertFalse(estado.cambiosGuardados)
+        assertTrue(estado.puedeGuardar)
     }
 }

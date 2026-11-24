@@ -17,6 +17,7 @@ data class PerfilUiState(
     val tocados: Set<CampoPerfil> = emptySet(),
     val guardando: Boolean = false,
     val cambiosGuardados: Boolean = false,
+    val errorGuardar: String? = null,
 ) {
     val errorNombre: String? get() = if (CampoPerfil.NOMBRE in tocados) validarNombre(nombre) else null
     val errorTelefono: String? get() = if (CampoPerfil.TELEFONO in tocados) validarTelefono(telefono) else null

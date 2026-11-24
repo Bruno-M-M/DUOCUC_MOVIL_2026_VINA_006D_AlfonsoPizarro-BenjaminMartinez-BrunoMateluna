@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.fundaciontextil.data.ServiceLocator
 import com.fundaciontextil.data.model.Emprendimiento
 import com.fundaciontextil.data.model.ResultadoRegistro
-import com.fundaciontextil.data.repository.OperacionNoDisponibleException
 import com.fundaciontextil.data.repository.RegistroEmprendedoraRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,7 +93,7 @@ class RegistroEmprendedoraViewModel(
             return
         }
 
-        actualizarCuenta { it.copy(cargando = true) }
+        actualizarCuenta { it.copy(cargando = true, errorGeneral = null) }
         viewModelScope.launch {
             val cuenta = actual.cuenta
             val emprendimiento = Emprendimiento(
@@ -103,13 +102,8 @@ class RegistroEmprendedoraViewModel(
                 comuna = actual.comuna!!,
                 categorias = actual.categorias,
             )
-            val resultado = try {
+            val resultado =
                 repositorio.registrar(cuenta.nombre, cuenta.correo, cuenta.rut, cuenta.clave, emprendimiento)
-            } catch (e: OperacionNoDisponibleException) {
-                // Sin conexión no se puede enviar la solicitud. Se libera el botón; el mensaje va en la siguiente iteración.
-                actualizarCuenta { it.copy(cargando = false) }
-                return@launch
-            }
             when (resultado) {
                 is ResultadoRegistro.Exito -> _uiState.update {
                     it.copy(cuenta = it.cuenta.copy(cargando = false), solicitudEnviada = true)
@@ -118,6 +112,8 @@ class RegistroEmprendedoraViewModel(
                     actualizarCuenta { it.copy(cargando = false, correoYaRegistrado = true) }
                 ResultadoRegistro.RutYaRegistrado ->
                     actualizarCuenta { it.copy(cargando = false, rutYaRegistrado = true) }
+                is ResultadoRegistro.NoDisponible ->
+                    actualizarCuenta { it.copy(cargando = false, errorGeneral = resultado.mensaje) }
             }
         }
     }

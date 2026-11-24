@@ -13,7 +13,8 @@ import androidx.room.RoomDatabase
         SolicitudEmprendedoraEntity::class,
         FotoPerfilEntity::class,
     ],
-    version = 6,
+    // 7: las cuentas locales pasan a ser copias del servidor, con el id del servidor.
+    version = 7,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

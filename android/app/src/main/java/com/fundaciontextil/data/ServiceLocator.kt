@@ -18,6 +18,11 @@ import com.fundaciontextil.data.repository.UsuarioRepositoryLocal
 import com.fundaciontextil.data.foto.LimpiezaFotos
 import com.fundaciontextil.data.local.PublicacionDao
 import com.fundaciontextil.data.repository.ProductoPublicacionRepository
+import com.fundaciontextil.BuildConfig
+import com.fundaciontextil.data.remote.AlmacenCuentasPreferencias
+import com.fundaciontextil.data.remote.ApiService
+import com.fundaciontextil.data.remote.RetrofitInstance
+import com.fundaciontextil.data.remote.ServidorFalso
 import com.fundaciontextil.data.remote.UsuarioRemoteRepository
 import com.fundaciontextil.data.repository.UsuarioRepositorioConRespaldo
 
@@ -63,5 +68,18 @@ object ServiceLocator {
 
     val limpiezaFotos: LimpiezaFotos by lazy { LimpiezaFotos(almacenFotos, fotoDao, publicacionDao) }
 
-    val usuarioRepository: UsuarioRepository by lazy { UsuarioRepositoryLocal(usuarioDao) }
+    // El único lugar donde se elige entre el servidor falso y el real.
+    val apiService: ApiService by lazy {
+        if (BuildConfig.USAR_SERVIDOR_FALSO) {
+            ServidorFalso(almacen = AlmacenCuentasPreferencias(contexto))
+        } else {
+            RetrofitInstance.api
+        }
+    }
+
+    val usuarioRemoteRepository: UsuarioRemoteRepository by lazy { UsuarioRemoteRepository(apiService) }
+
+    val usuarioRepository: UsuarioRepository by lazy {
+        UsuarioRepositorioConRespaldo(usuarioRemoteRepository, UsuarioRepositoryLocal(usuarioDao))
+    }
 }
