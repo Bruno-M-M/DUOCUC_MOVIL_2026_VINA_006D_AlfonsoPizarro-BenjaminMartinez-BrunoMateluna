@@ -7,6 +7,7 @@ data class LoginUiState(
     val claveTocada: Boolean = false,
     val cargando: Boolean = false,
     val errorCredenciales: String? = null,
+    val errorGeneral: String? = null,
 ) {
     val errorCorreo: String? get() = if (correoTocado) validarCorreo(correo) else null
     val errorClave: String? get() = if (claveTocada) validarClave(clave) else null

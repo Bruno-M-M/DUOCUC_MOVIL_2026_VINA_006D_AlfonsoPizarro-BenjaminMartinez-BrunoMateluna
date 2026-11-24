@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.fundaciontextil.data.ServiceLocator
+import com.fundaciontextil.data.model.ResultadoPerfil
 import com.fundaciontextil.data.repository.SesionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,7 +67,7 @@ class PerfilViewModel(
             return
         }
 
-        _uiState.update { it.copy(guardando = true) }
+        _uiState.update { it.copy(guardando = true, errorGuardar = null) }
         viewModelScope.launch {
             val editado = usuario.copy(
                 nombre = actual.nombre.trim(),
@@ -74,15 +75,19 @@ class PerfilViewModel(
                 region = actual.region,
                 comuna = actual.comuna,
             )
-            sesion.actualizarPerfil(editado)
-            _uiState.update {
-                it.copy(
-                    guardado = editado,
-                    nombre = editado.nombre,
-                    telefono = editado.telefono.orEmpty(),
-                    guardando = false,
-                    cambiosGuardados = true,
-                )
+            when (val resultado = sesion.actualizarPerfil(editado)) {
+                ResultadoPerfil.Guardado -> _uiState.update {
+                    it.copy(
+                        guardado = editado,
+                        nombre = editado.nombre,
+                        telefono = editado.telefono.orEmpty(),
+                        guardando = false,
+                        cambiosGuardados = true,
+                    )
+                }
+                // Lo escrito se conserva en el formulario para volver a intentarlo.
+                is ResultadoPerfil.NoDisponible ->
+                    _uiState.update { it.copy(guardando = false, errorGuardar = resultado.mensaje) }
             }
         }
     }

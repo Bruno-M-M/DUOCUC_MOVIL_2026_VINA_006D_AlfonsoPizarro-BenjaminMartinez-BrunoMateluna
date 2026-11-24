@@ -95,7 +95,7 @@ internal fun LoginContenido(
             accionIme = ImeAction.Done,
         )
 
-        uiState.errorCredenciales?.let { mensaje ->
+        (uiState.errorCredenciales ?: uiState.errorGeneral)?.let { mensaje ->
             Spacer(Modifier.height(8.dp))
             Text(
                 text = mensaje,

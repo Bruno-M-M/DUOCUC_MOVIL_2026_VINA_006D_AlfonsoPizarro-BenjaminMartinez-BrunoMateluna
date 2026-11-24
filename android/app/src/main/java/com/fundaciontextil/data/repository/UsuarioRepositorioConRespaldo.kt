@@ -1,14 +1,14 @@
 package com.fundaciontextil.data.repository
 
 import com.fundaciontextil.data.model.ResultadoInicioSesion
+import com.fundaciontextil.data.model.ResultadoPerfil
 import com.fundaciontextil.data.model.ResultadoRegistro
 import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.model.Usuario
 import com.fundaciontextil.data.remote.ResultadoRemoto
 import com.fundaciontextil.data.remote.UsuarioRemoteRepository
 
-class OperacionNoDisponibleException(motivo: String) : Exception(motivo)
-
+// Primero pregunta al servidor. Sin conexión, deja entrar y leer el perfil con la copia local.
 class UsuarioRepositorioConRespaldo(
     private val remoto: UsuarioRemoteRepository,
     private val local: UsuarioRepositoryLocal,
@@ -29,10 +29,10 @@ class UsuarioRepositorioConRespaldo(
             is ResultadoRemoto.ErrorServidor -> when (r.codigo) {
                 "CORREO_YA_REGISTRADO" -> ResultadoRegistro.CorreoYaRegistrado
                 "RUT_YA_REGISTRADO" -> ResultadoRegistro.RutYaRegistrado
-                else -> throw OperacionNoDisponibleException("El servidor respondió ${r.codigoHttp}")
+                else -> ResultadoRegistro.NoDisponible(MENSAJE_SERVIDOR)
             }
             ResultadoRemoto.SinConexion ->
-                throw OperacionNoDisponibleException("Necesitas conexión para crear la cuenta")
+                ResultadoRegistro.NoDisponible("Necesitas conexión para crear la cuenta")
         }
 
     override suspend fun iniciarSesion(correo: String, clave: String): ResultadoInicioSesion =
@@ -44,7 +44,7 @@ class UsuarioRepositorioConRespaldo(
             is ResultadoRemoto.ErrorServidor -> when (r.codigo) {
                 "CREDENCIALES_INCORRECTAS" -> ResultadoInicioSesion.CredencialesIncorrectas
                 "CUENTA_DADA_DE_BAJA" -> ResultadoInicioSesion.CuentaDadaDeBaja
-                else -> throw OperacionNoDisponibleException("El servidor respondió ${r.codigoHttp}")
+                else -> ResultadoInicioSesion.NoDisponible(MENSAJE_SERVIDOR)
             }
             ResultadoRemoto.SinConexion -> local.iniciarSesion(correo, clave)
         }
@@ -60,12 +60,19 @@ class UsuarioRepositorioConRespaldo(
             ResultadoRemoto.SinConexion -> local.buscarPorId(id)
         }
 
-    override suspend fun actualizarPerfil(usuario: Usuario) {
+    // No se guarda solo en el teléfono: la próxima lectura del servidor borraría ese cambio sin avisar.
+    override suspend fun actualizarPerfil(usuario: Usuario): ResultadoPerfil =
         when (val r = remoto.actualizarPerfil(usuario.id, usuario)) {
-            is ResultadoRemoto.Exito -> local.actualizarPerfil(r.datos)
-            ResultadoRemoto.SinConexion -> local.actualizarPerfil(usuario)
-            is ResultadoRemoto.ErrorServidor ->
-                throw OperacionNoDisponibleException("El servidor respondió ${r.codigoHttp}")
+            is ResultadoRemoto.Exito -> {
+                local.actualizarPerfil(r.datos)
+                ResultadoPerfil.Guardado
+            }
+            ResultadoRemoto.SinConexion ->
+                ResultadoPerfil.NoDisponible("Sin conexión: no se guardaron los cambios")
+            is ResultadoRemoto.ErrorServidor -> ResultadoPerfil.NoDisponible(MENSAJE_SERVIDOR)
         }
+
+    companion object {
+        const val MENSAJE_SERVIDOR = "El servidor no está disponible. Intenta más tarde"
     }
 }

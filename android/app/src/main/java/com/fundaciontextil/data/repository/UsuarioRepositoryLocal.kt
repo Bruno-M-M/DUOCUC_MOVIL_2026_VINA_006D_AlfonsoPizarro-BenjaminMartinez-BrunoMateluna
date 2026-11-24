@@ -5,6 +5,7 @@ import com.fundaciontextil.data.local.UsuarioDao
 import com.fundaciontextil.data.local.UsuarioEntity
 import com.fundaciontextil.data.model.EstadoCuenta
 import com.fundaciontextil.data.model.ResultadoInicioSesion
+import com.fundaciontextil.data.model.ResultadoPerfil
 import com.fundaciontextil.data.model.ResultadoRegistro
 import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.model.Usuario
@@ -72,7 +73,7 @@ class UsuarioRepositoryLocal(
 
     override suspend fun buscarPorId(id: Long): Usuario? = dao.buscarPorId(id)?.aUsuario()
 
-    override suspend fun actualizarPerfil(usuario: Usuario) {
+    override suspend fun actualizarPerfil(usuario: Usuario): ResultadoPerfil {
         dao.actualizarPerfil(
             id = usuario.id,
             nombre = usuario.nombre.trim(),
@@ -80,35 +81,24 @@ class UsuarioRepositoryLocal(
             region = usuario.region,
             comuna = usuario.comuna,
         )
+        return ResultadoPerfil.Guardado
     }
 
+    // Guarda o actualiza la copia local de una cuenta que el servidor confirmó. El id local es el del servidor.
     suspend fun guardarCopia(usuario: Usuario, clave: String, rut: String?) {
-        val existente = dao.buscarPorId(usuario.id)
+        val correo = normalizarCorreo(usuario.correo)
+        val existente = dao.buscarPorId(usuario.id)?.takeIf { it.correo == correo }
         val sal = Hasheador.generarSal()
         val claveHash = withContext(dispatcherCalculo) { Hasheador.hashClave(clave, sal) }
-        if (existente == null) {
-            val rutHash = rut?.let { withContext(dispatcherCalculo) { Hasheador.hashRut(it) } }
-                ?: "remoto-${usuario.id}"
-            dao.insertar(
-                UsuarioEntity(
-                    id = usuario.id,
-                    nombre = usuario.nombre,
-                    correo = normalizarCorreo(usuario.correo),
-                    rutHash = rutHash,
-                    claveHash = claveHash,
-                    sal = sal,
-                    rol = usuario.rol,
-                    estado = usuario.estado,
-                    telefono = usuario.telefono,
-                    region = usuario.region,
-                    comuna = usuario.comuna,
-                ),
-            )
-        } else {
-            dao.actualizarCopia(
+        val rutHash = existente?.rutHash
+            ?: rut?.let { withContext(dispatcherCalculo) { Hasheador.hashRut(it) } }
+            ?: "remoto-${usuario.id}"
+        dao.guardarCopia(
+            UsuarioEntity(
                 id = usuario.id,
                 nombre = usuario.nombre,
-                correo = normalizarCorreo(usuario.correo),
+                correo = correo,
+                rutHash = rutHash,
                 claveHash = claveHash,
                 sal = sal,
                 rol = usuario.rol,
@@ -116,9 +106,10 @@ class UsuarioRepositoryLocal(
                 telefono = usuario.telefono,
                 region = usuario.region,
                 comuna = usuario.comuna,
-            )
-        }
+            ),
+        )
     }
+
     private fun normalizarCorreo(correo: String): String = correo.trim().lowercase()
 
     private fun estadoInicial(rol: Rol): EstadoCuenta =

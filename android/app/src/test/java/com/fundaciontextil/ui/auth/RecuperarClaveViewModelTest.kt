@@ -6,6 +6,7 @@ import com.fundaciontextil.data.remote.RecuperarClaveDto
 import com.fundaciontextil.data.remote.UsuarioRemoteRepository
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.CompletableDeferred
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -57,12 +58,40 @@ class RecuperarClaveViewModelTest {
     }
 
     @Test
-    fun `sin conexion no se marca como enviado`() {
+    fun `sin conexion no se marca como enviado y se avisa`() {
         coEvery { api.recuperarClave(any()) } throws IOException("sin red")
         viewModel.alCambiarCorreo("camila@ejemplo.cl")
 
         viewModel.alEnviar()
 
         assertFalse(viewModel.uiState.value.enviado)
+        assertFalse(viewModel.uiState.value.enviando)
+        assertEquals(RecuperarClaveUiState.MENSAJE_SIN_CONEXION, viewModel.uiState.value.errorEnvio)
+
+        viewModel.alCambiarCorreo("camila@ejemplo.cl")
+        assertNull(viewModel.uiState.value.errorEnvio)
+    }
+
+    @Test
+    fun `si el servidor falla se avisa`() {
+        coEvery { api.recuperarClave(any()) } throws IllegalStateException("respuesta rara")
+        viewModel.alCambiarCorreo("camila@ejemplo.cl")
+
+        viewModel.alEnviar()
+
+        assertEquals(RecuperarClaveUiState.MENSAJE_SERVIDOR, viewModel.uiState.value.errorEnvio)
+    }
+
+    @Test
+    fun `mientras envia no se puede enviar de nuevo`() {
+        val respuesta = CompletableDeferred<Unit>()
+        coEvery { api.recuperarClave(any()) } coAnswers { respuesta.await() }
+        viewModel.alCambiarCorreo("camila@ejemplo.cl")
+
+        viewModel.alEnviar()
+        assertFalse(viewModel.uiState.value.puedeEnviar)
+
+        respuesta.complete(Unit)
+        assertTrue(viewModel.uiState.value.enviado)
     }
 }

@@ -2,7 +2,11 @@ package com.fundaciontextil.data.repository
 
 import com.fundaciontextil.data.local.AlmacenSesion
 import com.fundaciontextil.data.model.EstadoCuenta
+import com.fundaciontextil.data.model.ResultadoInicioSesion
+import com.fundaciontextil.data.model.ResultadoPerfil
+import com.fundaciontextil.data.model.ResultadoRegistro
 import com.fundaciontextil.data.model.Rol
+import com.fundaciontextil.data.model.Usuario
 import com.fundaciontextil.data.local.CatalogoDao
 import com.fundaciontextil.data.local.EmprendedoraEntity
 import com.fundaciontextil.data.local.ProductoEntity
@@ -32,6 +36,18 @@ internal class DaoFalso : UsuarioDao {
     override suspend fun actualizarPerfil(id: Long, nombre: String, telefono: String?, region: String?, comuna: String?) {
         val i = filas.indexOfFirst { it.id == id }
         if (i >= 0) filas[i] = filas[i].copy(nombre = nombre, telefono = telefono, region = region, comuna = comuna)
+    }
+
+    override suspend fun borrarCopiasViejas(id: Long, correo: String, rutHash: String): Int {
+        val antes = filas.size
+        filas.removeAll { (it.id == id && it.correo != correo) || (it.id != id && (it.correo == correo || it.rutHash == rutHash)) }
+        return antes - filas.size
+    }
+
+    var desvinculaciones = 0
+
+    override suspend fun desvincularEmprendedorasSinCuenta() {
+        desvinculaciones++
     }
 
     override suspend fun actualizarCopia(
@@ -104,4 +120,19 @@ internal class SolicitudEmprendedoraDaoFalso : SolicitudEmprendedoraDao {
     }
 
     override suspend fun buscarPorUsuario(usuarioId: Long) = filas.firstOrNull { it.usuarioId == usuarioId }
+}
+
+internal const val MENSAJE_SIN_SERVIDOR = "El servidor no responde"
+
+// Deja leer la cuenta, pero rechaza registrar, entrar y guardar, como cuando falla el servidor.
+internal class UsuariosSinServidor(private val lectura: UsuarioRepository) : UsuarioRepository {
+    override suspend fun registrar(nombre: String, correo: String, rut: String, clave: String, rol: Rol) =
+        ResultadoRegistro.NoDisponible(MENSAJE_SIN_SERVIDOR)
+
+    override suspend fun iniciarSesion(correo: String, clave: String) =
+        ResultadoInicioSesion.NoDisponible(MENSAJE_SIN_SERVIDOR)
+
+    override suspend fun buscarPorId(id: Long) = lectura.buscarPorId(id)
+
+    override suspend fun actualizarPerfil(usuario: Usuario) = ResultadoPerfil.NoDisponible(MENSAJE_SIN_SERVIDOR)
 }

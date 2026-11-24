@@ -5,10 +5,11 @@ import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.model.Usuario
 import com.google.gson.Gson
 import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 import retrofit2.HttpException
 
 class UsuarioRemoteRepository(
-    private val api: ApiService = RetrofitInstance.api,
+    private val api: ApiService,
 ) {
 
     suspend fun registrar(
@@ -51,6 +52,11 @@ class UsuarioRemoteRepository(
         ResultadoRemoto.SinConexion
     } catch (e: HttpException) {
         ResultadoRemoto.ErrorServidor(e.code(), codigoDeError(e))
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        // JSON mal formado, un rol desconocido o un campo que falta: no debe cerrar la app.
+        ResultadoRemoto.ErrorServidor(200, "RESPUESTA_INVALIDA")
     }
 
     private fun codigoDeError(e: HttpException): String? {

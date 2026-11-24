@@ -1,5 +1,7 @@
 package com.fundaciontextil.ui.auth
 
+import com.fundaciontextil.data.repository.UsuariosSinServidor
+import com.fundaciontextil.data.repository.MENSAJE_SIN_SERVIDOR
 import com.fundaciontextil.data.model.EstadoCuenta
 import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.repository.AlmacenSesionEnMemoria
@@ -135,5 +137,19 @@ class LoginViewModelTest {
         viewModel.alCambiarClave("hola1234")
 
         assertNull(viewModel.uiState.value.errorCredenciales)
+    }
+
+    @Test
+    fun `si el servidor no esta disponible se avisa sin culpar a la clave`() {
+        val lectura = UsuarioRepositoryLocal(DaoFalso(), Dispatchers.Unconfined)
+        val sinServidor = LoginViewModel(SesionRepository(UsuariosSinServidor(lectura), AlmacenSesionEnMemoria()))
+        sinServidor.alCambiarCorreo("camila@demo.cl")
+        sinServidor.alCambiarClave("telar2030")
+
+        sinServidor.alIngresar { throw AssertionError("no debía entrar") }
+
+        assertEquals(MENSAJE_SIN_SERVIDOR, sinServidor.uiState.value.errorGeneral)
+        assertNull(sinServidor.uiState.value.errorCredenciales)
+        assertFalse(sinServidor.uiState.value.cargando)
     }
 }

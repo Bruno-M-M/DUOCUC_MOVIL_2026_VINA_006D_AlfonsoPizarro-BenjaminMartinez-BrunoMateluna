@@ -22,7 +22,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Mientras no exista el servidor, la app de depuración usa ServidorFalso.
+            buildConfigField("boolean", "USAR_SERVIDOR_FALSO", "true")
+        }
         release {
+            buildConfigField("boolean", "USAR_SERVIDOR_FALSO", "false")
             optimization {
                 enable = false
             }

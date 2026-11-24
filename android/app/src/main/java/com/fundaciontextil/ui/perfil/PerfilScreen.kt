@@ -184,6 +184,15 @@ private fun Formulario(uiState: PerfilUiState, acciones: AccionesPerfil) {
         Text(if (uiState.guardando) "Guardando…" else "Guardar cambios")
     }
 
+    uiState.errorGuardar?.let { mensaje ->
+        Text(
+            mensaje,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .semantics { liveRegion = LiveRegionMode.Polite },
+        )
+    }
     AnimatedVisibility(
         visible = uiState.cambiosGuardados,
         enter = fadeIn() + expandVertically(),
