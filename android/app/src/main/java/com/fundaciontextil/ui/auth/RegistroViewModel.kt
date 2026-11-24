@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.fundaciontextil.data.ServiceLocator
 import com.fundaciontextil.data.model.ResultadoRegistro
 import com.fundaciontextil.data.model.Rol
+import com.fundaciontextil.data.repository.OperacionNoDisponibleException
 import com.fundaciontextil.data.repository.SesionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,7 +64,13 @@ class RegistroViewModel(
 
         _uiState.update { it.copy(cargando = true) }
         viewModelScope.launch {
-            val resultado = sesion.registrar(actual.nombre, actual.correo, actual.rut, actual.clave, Rol.CLIENTE)
+            val resultado = try {
+                sesion.registrar(actual.nombre, actual.correo, actual.rut, actual.clave, Rol.CLIENTE)
+            } catch (e: OperacionNoDisponibleException) {
+                // Sin conexión no se puede crear la cuenta. Se libera el botón; el mensaje va en la siguiente iteración.
+                _uiState.update { it.copy(cargando = false) }
+                return@launch
+            }
             when (resultado) {
                 is ResultadoRegistro.Exito -> {
                     _uiState.update { it.copy(cargando = false) }

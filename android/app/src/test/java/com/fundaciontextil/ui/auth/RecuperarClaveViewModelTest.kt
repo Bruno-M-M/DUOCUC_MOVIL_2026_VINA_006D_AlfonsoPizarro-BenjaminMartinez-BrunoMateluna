@@ -1,14 +1,26 @@
 package com.fundaciontextil.ui.auth
 
+import com.fundaciontextil.MainDispatcherRule
+import com.fundaciontextil.data.remote.ApiService
+import com.fundaciontextil.data.remote.RecuperarClaveDto
+import com.fundaciontextil.data.remote.UsuarioRemoteRepository
+import io.mockk.coEvery
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class RecuperarClaveViewModelTest {
 
-    private val viewModel = RecuperarClaveViewModel()
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val api: ApiService = mockk()
+    private val viewModel = RecuperarClaveViewModel(UsuarioRemoteRepository(api))
 
     @Test
     fun `el error no se muestra hasta que se escribe el correo`() {
@@ -36,10 +48,21 @@ class RecuperarClaveViewModelTest {
 
     @Test
     fun `con un correo valido se envia aunque no exista una cuenta con ese correo`() {
+        coEvery { api.recuperarClave(RecuperarClaveDto("nadie@demo.cl")) } returns Unit
         viewModel.alCambiarCorreo("nadie@demo.cl")
 
         viewModel.alEnviar()
 
         assertTrue(viewModel.uiState.value.enviado)
+    }
+
+    @Test
+    fun `sin conexion no se marca como enviado`() {
+        coEvery { api.recuperarClave(any()) } throws IOException("sin red")
+        viewModel.alCambiarCorreo("camila@ejemplo.cl")
+
+        viewModel.alEnviar()
+
+        assertFalse(viewModel.uiState.value.enviado)
     }
 }

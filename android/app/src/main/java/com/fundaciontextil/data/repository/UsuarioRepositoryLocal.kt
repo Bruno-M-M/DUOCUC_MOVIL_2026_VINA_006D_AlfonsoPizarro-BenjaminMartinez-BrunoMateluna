@@ -81,6 +81,44 @@ class UsuarioRepositoryLocal(
             comuna = usuario.comuna,
         )
     }
+
+    suspend fun guardarCopia(usuario: Usuario, clave: String, rut: String?) {
+        val existente = dao.buscarPorId(usuario.id)
+        val sal = Hasheador.generarSal()
+        val claveHash = withContext(dispatcherCalculo) { Hasheador.hashClave(clave, sal) }
+        if (existente == null) {
+            val rutHash = rut?.let { withContext(dispatcherCalculo) { Hasheador.hashRut(it) } }
+                ?: "remoto-${usuario.id}"
+            dao.insertar(
+                UsuarioEntity(
+                    id = usuario.id,
+                    nombre = usuario.nombre,
+                    correo = normalizarCorreo(usuario.correo),
+                    rutHash = rutHash,
+                    claveHash = claveHash,
+                    sal = sal,
+                    rol = usuario.rol,
+                    estado = usuario.estado,
+                    telefono = usuario.telefono,
+                    region = usuario.region,
+                    comuna = usuario.comuna,
+                ),
+            )
+        } else {
+            dao.actualizarCopia(
+                id = usuario.id,
+                nombre = usuario.nombre,
+                correo = normalizarCorreo(usuario.correo),
+                claveHash = claveHash,
+                sal = sal,
+                rol = usuario.rol,
+                estado = usuario.estado,
+                telefono = usuario.telefono,
+                region = usuario.region,
+                comuna = usuario.comuna,
+            )
+        }
+    }
     private fun normalizarCorreo(correo: String): String = correo.trim().lowercase()
 
     private fun estadoInicial(rol: Rol): EstadoCuenta =
