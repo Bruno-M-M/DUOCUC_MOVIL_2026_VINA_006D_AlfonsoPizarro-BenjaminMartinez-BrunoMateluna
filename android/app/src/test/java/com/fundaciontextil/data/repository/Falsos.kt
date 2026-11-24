@@ -1,6 +1,8 @@
 package com.fundaciontextil.data.repository
 
 import com.fundaciontextil.data.local.AlmacenSesion
+import com.fundaciontextil.data.model.EstadoCuenta
+import com.fundaciontextil.data.model.Rol
 import com.fundaciontextil.data.local.CatalogoDao
 import com.fundaciontextil.data.local.EmprendedoraEntity
 import com.fundaciontextil.data.local.ProductoEntity
@@ -16,7 +18,7 @@ internal class DaoFalso : UsuarioDao {
     val filas = mutableListOf<UsuarioEntity>()
 
     override suspend fun insertar(usuario: UsuarioEntity): Long {
-        val id = filas.size + 1L
+        val id = if (usuario.id != 0L) usuario.id else filas.size + 1L
         filas += usuario.copy(id = id)
         return id
     }
@@ -30,6 +32,25 @@ internal class DaoFalso : UsuarioDao {
     override suspend fun actualizarPerfil(id: Long, nombre: String, telefono: String?, region: String?, comuna: String?) {
         val i = filas.indexOfFirst { it.id == id }
         if (i >= 0) filas[i] = filas[i].copy(nombre = nombre, telefono = telefono, region = region, comuna = comuna)
+    }
+
+    override suspend fun actualizarCopia(
+        id: Long,
+        nombre: String,
+        correo: String,
+        claveHash: String,
+        sal: String,
+        rol: Rol,
+        estado: EstadoCuenta,
+        telefono: String?,
+        region: String?,
+        comuna: String?,
+    ) {
+        val i = filas.indexOfFirst { it.id == id }
+        if (i >= 0) filas[i] = filas[i].copy(
+            nombre = nombre, correo = correo, claveHash = claveHash, sal = sal,
+            rol = rol, estado = estado, telefono = telefono, region = region, comuna = comuna,
+        )
     }
 }
 

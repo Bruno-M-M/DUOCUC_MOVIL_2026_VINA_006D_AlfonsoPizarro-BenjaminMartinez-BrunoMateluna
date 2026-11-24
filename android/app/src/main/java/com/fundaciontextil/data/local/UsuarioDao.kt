@@ -3,6 +3,8 @@ package com.fundaciontextil.data.local
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.fundaciontextil.data.model.EstadoCuenta
+import com.fundaciontextil.data.model.Rol
 
 @Dao
 interface UsuarioDao {
@@ -21,4 +23,21 @@ interface UsuarioDao {
 
     @Query("UPDATE usuarios SET nombre = :nombre, telefono = :telefono, region = :region, comuna = :comuna WHERE id = :id")
     suspend fun actualizarPerfil(id: Long, nombre: String, telefono: String?, region: String?, comuna: String?)
+
+    @Query(
+        "UPDATE usuarios SET nombre = :nombre, correo = :correo, claveHash = :claveHash, sal = :sal, " +
+                "rol = :rol, estado = :estado, telefono = :telefono, region = :region, comuna = :comuna WHERE id = :id"
+    )
+    suspend fun actualizarCopia(
+        id: Long,
+        nombre: String,
+        correo: String,
+        claveHash: String,
+        sal: String,
+        rol: Rol,
+        estado: EstadoCuenta,
+        telefono: String?,
+        region: String?,
+        comuna: String?,
+    )
 }
