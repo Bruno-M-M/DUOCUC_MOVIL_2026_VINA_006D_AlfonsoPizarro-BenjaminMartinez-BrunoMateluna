@@ -40,6 +40,10 @@ object RegionesDeChile {
         Region("Magallanes", listOf("Cabo de Hornos", "Porvenir", "Puerto Natales", "Punta Arenas")),
     )
 
+    fun regionDe(comuna: String?): String? =
+        regiones.firstOrNull { comuna in it.comunas }?.nombre
+
+
     fun comunasDe(region: String?): List<String> =
         regiones.firstOrNull { it.nombre == region }?.comunas.orEmpty()
 }
