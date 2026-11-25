@@ -11,6 +11,7 @@ import com.fundaciontextil.ui.auth.RecuperarClaveScreen
 import com.fundaciontextil.ui.perfil.PerfilScreen
 import com.fundaciontextil.ui.producto.CatalogoEmprendedoraScreen
 import com.fundaciontextil.ui.producto.NuevoProductoScreen
+import com.fundaciontextil.ui.explorar.ExplorarScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -165,14 +166,9 @@ fun AppNav() {
                 )
             }
             composable(Rutas.EXPLORAR) {
-                PantallaDemo(
-                    "Explorar: lista de emprendedoras",
-                    listOf(
-                        Accion("Ver emprendedora 1") { navController.navigate(Rutas.emprendedora(1L)) },
-                        Accion("Ver emprendedora 2") { navController.navigate(Rutas.emprendedora(2L)) },
-                    ),
-                )
+                ExplorarScreen(alVerEmprendedora = { id -> navController.navigate(Rutas.emprendedora(id)) })
             }
+
             composable(
                 Rutas.EMPRENDEDORA,
                 arguments = listOf(navArgument("emprendedoraId") { type = NavType.LongType }),
