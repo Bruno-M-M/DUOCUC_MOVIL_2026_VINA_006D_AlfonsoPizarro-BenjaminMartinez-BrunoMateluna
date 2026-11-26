@@ -16,13 +16,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fundaciontextil.data.model.Emprendedora
 import com.fundaciontextil.data.model.RegionesDeChile
+import com.fundaciontextil.data.ubicacion.UbicacionActual
 import com.fundaciontextil.ui.components.SelectorDeLista
+import com.fundaciontextil.ui.permisos.rememberPermisoUbicacion
+import kotlinx.coroutines.launch
 
 @Composable
 fun ExplorarScreen(
@@ -30,6 +35,11 @@ fun ExplorarScreen(
     viewModel: ExplorarViewModel = viewModel(factory = ExplorarViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val contexto = LocalContext.current
+    val alcance = rememberCoroutineScope()
+    val pedirUbicacion = rememberPermisoUbicacion {
+        alcance.launch { viewModel.alObtenerUbicacion(UbicacionActual(contexto).obtener()) }
+    }
     ExplorarContenido(
         uiState = uiState,
         alElegirRegion = { viewModel.alElegirRegion(it) },
@@ -37,6 +47,7 @@ fun ExplorarScreen(
         alLimpiar = { viewModel.limpiarFiltros() },
         alReintentar = viewModel::cargar,
         alVerEmprendedora = alVerEmprendedora,
+        alOrdenarPorCercania = pedirUbicacion,
     )
 }
 
@@ -48,6 +59,7 @@ internal fun ExplorarContenido(
     alLimpiar: () -> Unit,
     alReintentar: () -> Unit,
     alVerEmprendedora: (Long) -> Unit,
+    alOrdenarPorCercania: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 16.dp),
@@ -69,6 +81,8 @@ internal fun ExplorarContenido(
             error = null,
             habilitado = uiState.region != null,
         )
+        TextButton(onClick = alOrdenarPorCercania) { Text("Ordenar por cercanía") }
+        uiState.avisoUbicacion?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
         if (uiState.hayFiltros) TextButton(onClick = alLimpiar) { Text("Limpiar filtros") }
 
         when {

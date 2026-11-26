@@ -1,5 +1,10 @@
 package com.fundaciontextil.ui.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import com.fundaciontextil.data.ServiceLocator
 import com.fundaciontextil.ui.splash.SplashScreen
 import com.fundaciontextil.ui.components.Accion
@@ -109,7 +114,12 @@ fun AppNav() {
             navController = navController,
             startDestination = Rutas.SPLASH,
             modifier = Modifier.padding(padding),
-        ) {
+            enterTransition = { fadeIn(tween(250)) + slideInHorizontally(tween(250)) { it / 6 } },
+            exitTransition = { fadeOut(tween(200)) },
+            popEnterTransition = { fadeIn(tween(250)) },
+            popExitTransition = { fadeOut(tween(200)) + slideOutHorizontally(tween(200)) { it / 6 } },
+
+            ) {
             composable(Rutas.ACCESO) {
                 PantallaDemo(
                     "Bienvenida/o",

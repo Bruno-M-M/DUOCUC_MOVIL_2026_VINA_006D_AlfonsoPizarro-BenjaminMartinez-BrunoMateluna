@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.fundaciontextil.data.ServiceLocator
 import com.fundaciontextil.data.repository.CatalogoRepository
+import com.fundaciontextil.data.ubicacion.Coordenada
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,8 +46,18 @@ class ExplorarViewModel(
 
     fun limpiarFiltros() = _uiState.update { it.copy(region = null, comuna = null) }
 
+    fun alObtenerUbicacion(lugar: Coordenada?) = _uiState.update {
+        it.copy(
+            ubicacion = lugar,
+            avisoUbicacion = if (lugar == null) MENSAJE_SIN_UBICACION else MENSAJE_APROXIMADA,
+        )
+    }
+
     companion object {
         const val MENSAJE_ERROR = "No pudimos cargar las emprendedoras"
+        const val MENSAJE_SIN_UBICACION = "No pudimos obtener tu ubicación. Elige tu comuna."
+        const val MENSAJE_APROXIMADA = "Orden aproximado: distancia al centro de cada comuna."
+
 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer { ExplorarViewModel(ServiceLocator.catalogoRepository) }

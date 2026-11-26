@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.fundaciontextil.MainDispatcherRule
 import com.fundaciontextil.data.model.Emprendedora
 import com.fundaciontextil.data.repository.CatalogoRepository
+import com.fundaciontextil.data.ubicacion.Coordenada
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -85,4 +86,21 @@ class ExplorarViewModelTest {
         assertEquals(listOf(ana, rosa), viewModel.uiState.value.visibles)
         assertFalse(viewModel.uiState.value.hayFiltros)
     }
+
+    @Test
+    fun `con ubicacion ordena por cercania y avisa que es aproximada`() {
+        val viewModel = conDatos()
+        viewModel.alObtenerUbicacion(Coordenada(-33.03, -71.55))
+        assertEquals(listOf(rosa, ana), viewModel.uiState.value.visibles)
+        assertEquals(ExplorarViewModel.MENSAJE_APROXIMADA, viewModel.uiState.value.avisoUbicacion)
+    }
+
+    @Test
+    fun `sin ubicacion mantiene el orden y avisa`() {
+        val viewModel = conDatos()
+        viewModel.alObtenerUbicacion(null)
+        assertEquals(listOf(ana, rosa), viewModel.uiState.value.visibles)
+        assertEquals(ExplorarViewModel.MENSAJE_SIN_UBICACION, viewModel.uiState.value.avisoUbicacion)
+    }
+
 }
