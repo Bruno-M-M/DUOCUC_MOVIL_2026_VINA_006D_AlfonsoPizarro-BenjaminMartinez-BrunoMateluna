@@ -104,6 +104,15 @@ fun rememberPermisoCamara(accion: () -> Unit): () -> Unit = rememberPermisoAccio
     accion = accion,
 )
 
+@Composable
+fun rememberPermisoUbicacion(accion: () -> Unit): () -> Unit = rememberPermisoAccion(
+    permiso = Manifest.permission.ACCESS_COARSE_LOCATION,
+    explicacion = "Usamos tu ubicación aproximada solo para ordenar las emprendedoras por cercanía.",
+    mensajeDenegado = "Sin ubicación puedes filtrar eligiendo tu región y comuna.",
+    accion = accion,
+)
+
+
 private fun Context.buscarActividad(): Activity? {
     var actual: Context = this
     while (actual is ContextWrapper) {

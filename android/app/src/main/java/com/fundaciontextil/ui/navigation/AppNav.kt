@@ -1,5 +1,10 @@
 package com.fundaciontextil.ui.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import com.fundaciontextil.data.ServiceLocator
 import com.fundaciontextil.ui.splash.SplashScreen
 import com.fundaciontextil.ui.components.Accion
@@ -11,6 +16,7 @@ import com.fundaciontextil.ui.auth.RecuperarClaveScreen
 import com.fundaciontextil.ui.perfil.PerfilScreen
 import com.fundaciontextil.ui.producto.CatalogoEmprendedoraScreen
 import com.fundaciontextil.ui.producto.NuevoProductoScreen
+import com.fundaciontextil.ui.explorar.ExplorarScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -108,7 +114,12 @@ fun AppNav() {
             navController = navController,
             startDestination = Rutas.SPLASH,
             modifier = Modifier.padding(padding),
-        ) {
+            enterTransition = { fadeIn(tween(250)) + slideInHorizontally(tween(250)) { it / 6 } },
+            exitTransition = { fadeOut(tween(200)) },
+            popEnterTransition = { fadeIn(tween(250)) },
+            popExitTransition = { fadeOut(tween(200)) + slideOutHorizontally(tween(200)) { it / 6 } },
+
+            ) {
             composable(Rutas.ACCESO) {
                 PantallaDemo(
                     "Bienvenida/o",
@@ -165,14 +176,9 @@ fun AppNav() {
                 )
             }
             composable(Rutas.EXPLORAR) {
-                PantallaDemo(
-                    "Explorar: lista de emprendedoras",
-                    listOf(
-                        Accion("Ver emprendedora 1") { navController.navigate(Rutas.emprendedora(1L)) },
-                        Accion("Ver emprendedora 2") { navController.navigate(Rutas.emprendedora(2L)) },
-                    ),
-                )
+                ExplorarScreen(alVerEmprendedora = { id -> navController.navigate(Rutas.emprendedora(id)) })
             }
+
             composable(
                 Rutas.EMPRENDEDORA,
                 arguments = listOf(navArgument("emprendedoraId") { type = NavType.LongType }),
